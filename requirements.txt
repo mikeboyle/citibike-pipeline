@@ -1,0 +1,10 @@
+# Core dependencies for local development and testing
+google-cloud-bigquery>=3.13.0
+
+# Development utilities  
+python-dotenv>=1.0.0
+
+# Note: Component-specific requirements are in:
+# - airflow/requirements.txt
+# - dbt/requirements.txt  
+# - ingestion/requirements.txt
