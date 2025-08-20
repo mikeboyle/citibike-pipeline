@@ -1,5 +1,4 @@
---NOTE: replace project_id with your BigQuery project id
-CREATE TABLE `{project_id}.raw.citibike_trips_current` (
+CREATE TABLE `{project_id}.{dataset_name}.citibike_trips_current` (
   ride_id STRING,                        -- Unique ride identifier
   rideable_type STRING,                  -- classic_bike, electric_bike, docked_bike
   started_at TIMESTAMP,                  -- Start time and date

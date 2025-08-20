@@ -1,5 +1,4 @@
---NOTE: replace project_id with your BigQuery project id
-CREATE TABLE `{project_id}.raw.citibike_trips_legacy` (
+CREATE TABLE `{project_id}.{dataset_name}.citibike_trips_legacy` (
   tripduration INT64,                    -- Trip duration in seconds
   starttime TIMESTAMP,                   -- Start time and date
   stoptime TIMESTAMP,                    -- Stop time and date
