@@ -1,0 +1,59 @@
+# Environment variables
+.env
+config/service-account.json
+config/*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+venv/
+.venv/
+
+# dbt
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
+
+# Airflow
+airflow/logs/*
+!airflow/logs/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.vim/
+
+# OS
+.DS_Store
+Thumbs.db
+*.tmp
+
+# Data files (if any get downloaded locally)
+*.csv
+*.json.gz
+*.parquet
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
