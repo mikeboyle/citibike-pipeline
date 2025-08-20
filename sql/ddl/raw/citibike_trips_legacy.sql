@@ -1,0 +1,21 @@
+--NOTE: replace project_id with your BigQuery project id
+CREATE TABLE `{project_id}.raw.citibike_trips_legacy` (
+  tripduration INT64,                    -- Trip duration in seconds
+  starttime TIMESTAMP,                   -- Start time and date
+  stoptime TIMESTAMP,                    -- Stop time and date
+  `start station id` INT64,              -- Start station ID
+  `start station name` STRING,           -- Start station name
+  `start station latitude` FLOAT64,     -- Start station latitude
+  `start station longitude` FLOAT64,    -- Start station longitude
+  `end station id` INT64,                -- End station ID
+  `end station name` STRING,             -- End station name
+  `end station latitude` FLOAT64,       -- End station latitude
+  `end station longitude` FLOAT64,      -- End station longitude
+  bikeid INT64,                          -- Bike ID
+  usertype STRING,                       -- Customer or Subscriber
+  `birth year` INT64,                    -- Year of birth (nullable)
+  gender INT64,                          -- 0=unknown, 1=male, 2=female (nullable)
+  _ingested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
+)
+PARTITION BY DATE(_ingested_at)
+CLUSTER BY `start station id`, starttime;
