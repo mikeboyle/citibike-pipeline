@@ -52,6 +52,12 @@ A modern data stack implementation using Citibike trip and station data.
 5. **Save Credentials**
    - Save the JSON key as `config/service-account.json`
 
+6. **Create Config Template**
+   ```bash
+   cp config/dev.env.example config/dev.env
+   cp config/dev.env.example config/prod.env
+   ```
+
 ### 2. Local Environment Setup
 
 1. **Create Virtual Environment**
@@ -65,9 +71,12 @@ A modern data stack implementation using Citibike trip and station data.
    pip install --upgrade pip
    pip install -r requirements.txt
    ```
+
 3. **Configure Environment-Dependent Parameters**
    - Copy `config/dev.env.example` to `config/dev.env`
-   - Update `GCP_PROJECT_ID` with your actual project ID
+   - Copy `config/dev.env.example` `config/prod.env`
+   - Update `GCP_PROJECT_ID` in both files with your actual project ID
+   - Verify `GOOGLE_APPLICATION_CREDENTIALS` points to your JSON file path
 
 ### 3. Create BigQuery tables
 
@@ -77,19 +86,8 @@ A modern data stack implementation using Citibike trip and station data.
    - Run `python create_tables.py prod` to create tables in `prod` environment
    - This creates the raw layer tables for data ingestion 
 
-2. **Test Setup**
-   Run this code in your terminal:
-   ```bash
-   set -a && source config/dev.env && set +a
-   python3 -c "
-   from google.cloud import bigquery
-   import os
-   client = bigquery.Client(project=os.environ['GCP_PROJECT_ID'])
-   datasets = [d.dataset_id for d in client.list_datasets()]
-   print('Connected! Datasets:', datasets)
-   "
-   ```
-   You should see the list of datasets you created in BigQuery.
+2. **Manually verify**
+   Go to the BigQuery console and confirm that the expected tables were created with the columns and datatypes you expect.
 
 ### 4. Next Steps
 TODO: Add instructions for ingestion scripts, dbt models, and Airflow setup as they are built.
