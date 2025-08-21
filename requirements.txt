@@ -1,10 +1,29 @@
-# Core dependencies for local development and testing
-google-cloud-bigquery>=3.13.0
-
-# Development utilities  
-python-dotenv>=1.0.0
-
-# Note: Component-specific requirements are in:
-# - airflow/requirements.txt
-# - dbt/requirements.txt  
-# - ingestion/requirements.txt
+cachetools==5.5.2
+certifi==2025.8.3
+charset-normalizer==3.4.3
+google-api-core==2.25.1
+google-auth==2.40.3
+google-cloud-bigquery==3.35.1
+google-cloud-core==2.4.3
+google-crc32c==1.7.1
+google-resumable-media==2.7.2
+googleapis-common-protos==1.70.0
+grpcio==1.74.0
+grpcio-status==1.74.0
+idna==3.10
+numpy==2.3.2
+packaging==25.0
+pandas==2.3.2
+proto-plus==1.26.1
+protobuf==6.32.0
+pyarrow==21.0.0
+pyasn1==0.6.1
+pyasn1_modules==0.4.2
+python-dateutil==2.9.0.post0
+python-dotenv==1.1.1
+pytz==2025.2
+requests==2.32.5
+rsa==4.9.1
+six==1.17.0
+tzdata==2025.2
+urllib3==2.5.0
