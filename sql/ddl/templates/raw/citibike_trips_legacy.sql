@@ -1,4 +1,4 @@
-CREATE TABLE `{project_id}.{dataset_name}.citibike_trips_legacy` (
+CREATE OR REPLACE TABLE `{project_id}.{dataset_name}.citibike_trips_legacy{suffix}` (
   tripduration INT64,                    -- Trip duration in seconds
   starttime TIMESTAMP,                   -- Start time and date
   stoptime TIMESTAMP,                    -- Stop time and date

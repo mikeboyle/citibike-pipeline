@@ -1,4 +1,4 @@
-CREATE TABLE `{project_id}.{dataset_name}.citibike_trips_current` (
+CREATE OR REPLACE TABLE `{project_id}.{dataset_name}.citibike_trips_current{suffix}` (
   ride_id STRING,                        -- Unique ride identifier
   rideable_type STRING,                  -- classic_bike, electric_bike, docked_bike
   started_at TIMESTAMP,                  -- Start time and date

@@ -4,9 +4,23 @@ import sys
 
 
 ENV_NAMES = ["dev", "prod"]
-TABLE_NAMES = ["citibike_stations"]
+TABLE_NAMES = ["citibike_stations", "citibike_trips_current", "citibike_trips_legacy"]
+TABLE_SUFFIXES = ["", "_staging"]
 
-def run():
+def populate_create_table_query(template_string: str, 
+                                project_id: str,
+                                dataset_name: str,
+                                suffix: str = ""
+    ) -> str:
+    output_str = template_string.format(
+        project_id=project_id,
+        dataset_name=dataset_name,
+        suffix=suffix
+    )
+
+    return output_str
+
+def run() -> None:
     if len(sys.argv) < 2 or not sys.argv[1] in ENV_NAMES:
         raise Exception("Usage: python create_tables.py <dev|prod>")
     else:
@@ -21,37 +35,52 @@ def run():
     if not dataset_name or not project_id:
         raise Exception(f"Config missing values for BQ_DATASET_RAW or GCP_PROJECT_ID. Config = {config}")
 
+    # Prepare list of tables that will be created
+    tables_to_create = [f"`{project_id}.{dataset_name}.{table_name}{suffix}`" for table_name in TABLE_NAMES for suffix in TABLE_SUFFIXES]
+    print(f"The following tables will be created in env {env_name}:")
+    for table_to_create in tables_to_create:
+        print(table_to_create)
+    
+    print("Enter y to proceed, any other key to abort")
+    should_proceed = input()
+
+    if should_proceed != "y":
+        print("Aborting process.")
+        return
+    
+    # Actually create the tables
     for table_name in TABLE_NAMES:
-        print(f"Creating table `{project_id}.{dataset_name}.{table_name}` in env {env_name}")
+        print(f"Preparing create table queries for {dataset_name}.{table_name}{TABLE_SUFFIXES[0]} and {dataset_name}.{table_name}{TABLE_SUFFIXES[1]}...")
+
         template_file = f"sql/ddl/templates/raw/{table_name}.sql"
         
         with open(template_file, "r") as f_in:
             template_string = f_in.read()
         
-        output_str = template_string.format(
-            project_id=project_id,
-            dataset_name=dataset_name
-        )
-    
-        print("The following SQL will be run on BigQuery:")
-        for line in output_str.split("\n"):
-            print(line)
+        for suffix in TABLE_SUFFIXES:
+            query = populate_create_table_query(template_string, project_id, dataset_name, suffix)
         
-        print("Does this look right? Type y to proceed, any other key to abort.")
-        proceed = input()
-
-        if proceed != 'y':
-            print("Gotcha. Better safe than sorry!")
-            return # abort the entire script
-        
-        else:
-            try:
-                job = client.query(output_str)
-                job.result() # Wait for completion, raise exception if failed
-                print(f"Successfully created table {table_name}")
+            print("The following SQL will be run on BigQuery:")
+            for line in query.split("\n"):
+                print(line)
             
-            except Exception as e:
-                print(f"Failed to create table {table_name}: {e}")
+            print("Does this look right? Type y to proceed, any other key to skip.")
+            proceed = input()
+
+            if proceed != 'y':
+                print("Skipping table")
+                continue # move on to next table
+            
+            else:
+                try:
+                    job = client.query(query)
+                    job.result() # Wait for completion, raise exception if failed
+                    print(f"Successfully created table {table_name}")
+                
+                except Exception as e:
+                    print(f"Failed to create table {table_name}: {e}")
+    
+    print("Table creation complete.")
 
 
 if __name__ == "__main__":
