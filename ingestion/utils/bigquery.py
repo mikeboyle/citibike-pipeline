@@ -9,4 +9,4 @@ def initialize_bigquery_client(config: Dict[str, Any]) -> bigquery.Client:
         credentials=credentials
     )
     
-    return client 
+    return client
