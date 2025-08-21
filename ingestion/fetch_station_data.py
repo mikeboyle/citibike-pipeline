@@ -16,13 +16,17 @@ def extract_station_rows(res: requests.Response) -> List[Dict[str, Any]]:
     
     rows = []
     for station in stations:
-        rows.append({
-            "station_data": json.dumps(station),
-            "api_last_updated": api_last_updated.isoformat(),
-            "api_version": api_version,
-            "_ingested_at": datetime.now(timezone.utc).isoformat(),
-        })
-    
+        station_id = station.get("station_id")
+        if not station_id:
+            print(f"Cannot ingest station; station_id field missing. {station}")
+        else:
+            rows.append({
+                "station_id": station_id,
+                "station_data": json.dumps(station),
+                "api_last_updated": api_last_updated.isoformat(),
+                "api_version": api_version,
+                "_ingested_at": datetime.now(timezone.utc).isoformat(),
+            })
     return rows
 
 def run(config: Dict[str, Any]):
