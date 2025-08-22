@@ -12,7 +12,8 @@ CREATE OR REPLACE TABLE `{project_id}.{dataset_name}.citibike_trips_current{suff
   end_lat FLOAT64,                       -- End latitude
   end_lng FLOAT64,                       -- End longitude
   member_casual STRING,                  -- member or casual
-  _ingested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
+  _ingested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
+  _batch_key STRING                      -- YYYY-MM-batch_num
 )
 PARTITION BY DATE(_ingested_at)
 CLUSTER BY start_station_id, started_at;

@@ -14,7 +14,8 @@ CREATE OR REPLACE TABLE `{project_id}.{dataset_name}.citibike_trips_legacy{suffi
   usertype STRING,                       -- Customer or Subscriber
   `birth year` INT64,                    -- Year of birth (nullable)
   gender INT64,                          -- 0=unknown, 1=male, 2=female (nullable)
-  _ingested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
+  _ingested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
+  _batch_key STRING                      -- YYYY-MM-batch_num
 )
 PARTITION BY DATE(_ingested_at)
 CLUSTER BY `start station id`, starttime;

@@ -1,6 +1,7 @@
 import pandas as pd
 from pandas.api.extensions import ExtensionDtype
 from typing import Dict
+from datetime import timezone
 
 
 def validate_and_cast_trip_schema(df: pd.DataFrame, schema: Dict[str, ExtensionDtype]) -> pd.DataFrame:
@@ -39,3 +40,22 @@ def validate_and_cast_trip_schema(df: pd.DataFrame, schema: Dict[str, ExtensionD
             raise ValueError(f"Failed to cast column '{column}' to {expected_type}: {e}")
     
     return df_typed
+
+def add_metadata_columns(df: pd.DataFrame, batch_key_value: str, batch_key_col: str = "_batch_key") -> pd.DataFrame:
+    """
+    Add metadata columns to a validated DataFrame
+
+    Args:
+        df: Validated DataFrame with correct schema
+        batch_key_value: Batch identifier (e.g., "2024-01-01")
+        batch_key_col: Name of the batch key column (default "_batch_key") 
+    """
+    df_with_metadata = df.copy()
+
+    # Add ingestion timestamp (when our pipeline ingested this data)
+    df_with_metadata["_ingested_at"] = pd.Timestamp.now(tz=timezone.utc)
+
+    # Add batch key (the time in history of the actual data)
+    df_with_metadata[batch_key_col] = batch_key_value
+
+    return df_with_metadata
