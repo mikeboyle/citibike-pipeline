@@ -1,8 +1,7 @@
-from pandas.api.extensions import ExtensionDtype
-from typing import Dict
+from typing import Any, Dict
 
 # What we expect from Citibike CSV files (2020+)
-CURRENT_TRIP_CSV_SCHEMA = {
+CURRENT_TRIP_CSV_SCHEMA: Dict[str, Any] = {
     'ride_id': 'string',
     'rideable_type': 'string',
     'started_at': 'datetime64[ns]',

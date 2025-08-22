@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List
 import pandas as pd
 
-def extract_station_rows(res: requests.Response, batch_key_value: str) -> List[Dict[str, Any]]:
+def _extract_station_rows(res: requests.Response, batch_key_value: str) -> List[Dict[str, Any]]:
     res_json = res.json()
     api_last_updated = datetime.fromtimestamp(res_json.get('last_updated'), tz=timezone.utc)
     api_version = res_json.get('version')
@@ -31,7 +31,7 @@ def extract_station_rows(res: requests.Response, batch_key_value: str) -> List[D
             })
     return rows
 
-def run(config: Dict[str, Any], batch_date: datetime) -> None:
+def ingest_station_data(config: Dict[str, Any], batch_date: datetime) -> None:
     # Fetch latest station data
     station_url = config['GBFS_STATION_URL']
     res = requests.get(station_url)
@@ -39,7 +39,7 @@ def run(config: Dict[str, Any], batch_date: datetime) -> None:
 
     # Extract rows from response (one station = one row)
     batch_key_value = batch_date.isoformat()
-    rows = extract_station_rows(res, batch_key_value)
+    rows = _extract_station_rows(res, batch_key_value)
     print(f"found {len(rows)} stations")
 
     # Convert to dataframe and cast columns
@@ -69,4 +69,4 @@ def run(config: Dict[str, Any], batch_date: datetime) -> None:
 if __name__ == "__main__":
     config = load_config("dev")
     batch_date = datetime(2025, 8, 21)
-    run(config, batch_date)
+    ingest_station_data(config, batch_date)
