@@ -34,6 +34,9 @@ def validate_and_cast_trip_schema(df: pd.DataFrame, schema: Dict[str, ExtensionD
         try:
             if expected_type == "datetime64[ns]":
                 df_typed[column] = pd.to_datetime(df_typed[column])
+            elif expected_type in ['int64', 'Int64', 'float64']:
+                # Force numeric conversion first, then to integer
+                df_typed[column] = pd.to_numeric(df_typed[column], errors="coerce").astype(expected_type)
             else:
                 df_typed[column] = df_typed[column].astype(expected_type)
         except (ValueError, TypeError) as e:

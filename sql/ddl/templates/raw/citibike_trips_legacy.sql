@@ -6,7 +6,7 @@ CREATE OR REPLACE TABLE `{project_id}.{dataset_name}.citibike_trips_legacy{suffi
   `start station name` STRING,           -- Start station name
   `start station latitude` FLOAT64,     -- Start station latitude
   `start station longitude` FLOAT64,    -- Start station longitude
-  `end station id` INT64,                -- End station ID
+  `end station id` STRING,                -- End station ID
   `end station name` STRING,             -- End station name
   `end station latitude` FLOAT64,       -- End station latitude
   `end station longitude` FLOAT64,      -- End station longitude
