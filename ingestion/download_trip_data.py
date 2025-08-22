@@ -21,7 +21,7 @@ def ingest_current_trip_data(config: Dict[str, Any], year: int, month: int) -> N
     loader = StagingTableLoader(client, table_id, "_batch_key", "ride_id")
 
     # Download and extract CSV files
-    downloader = TripDataDownloader(storage)
+    downloader = TripDataDownloader(storage, config["TRIP_DATA_URL"])
     csv_paths = downloader.download_month(year, month)
     print(f"Downloaded CSV files to paths {csv_paths}")
 
@@ -67,7 +67,11 @@ def _process_csv_batch(csv_path: str, batch_key_val: str, loader: StagingTableLo
 
 # TODO: remove this after development
 if __name__ == "__main__":
-    year, month = 2024, 1
+    # Months to test:
+    # - 2024-01: new filename pattern: YYYYMM-citibike-tripdata.zip, contians YYYYMM-citibike-tripdata_N.csv
+    # - 2022-08: old pattern: YYYY-citibike-tripdata.zip, contains YYYYMM-citibike-tripdata.zip, which has YYYYMM-citibike-tripdata_N.csv
+    # - 2019-06: old pattern: YYYY-citibike-tripdata.zip, contains 06_June which has YYYYMM-citibike-tripdata_N.csv
+    year, month = 2025, 6
     config = load_config("dev")
 
     print(f"Starting ingestion for {year}-{month:02d}")
