@@ -2,7 +2,7 @@ CREATE OR REPLACE TABLE `{project_id}.{dataset_name}.citibike_trips_legacy{suffi
   tripduration INT64,                    -- Trip duration in seconds
   starttime TIMESTAMP,                   -- Start time and date
   stoptime TIMESTAMP,                    -- Stop time and date
-  `start station id` INT64,              -- Start station ID
+  `start station id` STRING,              -- Start station ID
   `start station name` STRING,           -- Start station name
   `start station latitude` FLOAT64,     -- Start station latitude
   `start station longitude` FLOAT64,    -- Start station longitude
