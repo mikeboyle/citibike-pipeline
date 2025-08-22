@@ -25,15 +25,15 @@ def ingest_current_trip_data(config: Dict[str, Any], year: int, month: int) -> N
     csv_paths = downloader.download_month(year, month)
     print(f"Downloaded CSV files to paths {csv_paths}")
 
-    # # Process each CSV file as a separate batch
-    # for csv_path in csv_paths:
-    #     batch_key = _extract_batch_key_from_filename(csv_path)
-    #     _process_csv_batch(csv_path, batch_key, loader)
+    # Process each CSV file as a separate batch
+    for csv_path in csv_paths:
+        batch_key = _extract_batch_key_from_filename(csv_path)
+        _process_csv_batch(csv_path, batch_key, loader)
     
-    # # Clean up downloaded files
-    # storage.cleanup(csv_paths)
+    # Clean up downloaded files
+    storage.cleanup(csv_paths)
 
-    # print(f"Successfully ingested trip data for {year}-{month:02d}")
+    print(f"Successfully ingested trip data for {year}-{month:02d}")
 
 def _extract_batch_key_from_filename(csv_path: str) -> str:
     filename = os.path.basename(csv_path)
@@ -71,7 +71,7 @@ if __name__ == "__main__":
     # - 2024-01: new filename pattern: YYYYMM-citibike-tripdata.zip, contians YYYYMM-citibike-tripdata_N.csv
     # - 2022-08: old pattern: YYYY-citibike-tripdata.zip, contains YYYYMM-citibike-tripdata.zip, which has YYYYMM-citibike-tripdata_N.csv
     # - 2019-06: old pattern: YYYY-citibike-tripdata.zip, contains 06_June which has YYYYMM-citibike-tripdata_N.csv
-    year, month = 2024, 6
+    year, month = 2025, 6
     config = load_config("dev")
 
     print(f"Starting ingestion for {year}-{month:02d}")
