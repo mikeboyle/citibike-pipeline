@@ -11,6 +11,14 @@ from utils.config import load_config
 from utils.bigquery import initialize_bigquery_client
 
 
+def ingest_trip_data(config: Dict[str, Any], year: int, month: int):
+    """Main function to be called by orchestrators"""
+    # Choose which schema based on year parameters
+    if year < 2020:
+        _ingest_legacy_trip_data(config, year, month)
+    else:
+        _ingest_current_trip_data(config, year, month)
+
 def _ingest_trip_data(config: Dict[str, Any], year: int, month: int, table_name: str, schema: Dict[str, Any]):
     """Download and ingest trip data for the given month, table, and schema."""
     # Initialize components
@@ -35,13 +43,13 @@ def _ingest_trip_data(config: Dict[str, Any], year: int, month: int, table_name:
     print(f"Successfully ingested trip data for {year}-{month:02d}")
 
 
-def ingest_legacy_trip_data(config: Dict[str, Any], year: int, month: int) -> None:
+def _ingest_legacy_trip_data(config: Dict[str, Any], year: int, month: int) -> None:
     """Download and ingest trip data for the given month, expecting the legacy schema."""
     _ingest_trip_data(config, year, month, "citibike_trips_legacy", LEGACY_TRIP_CSV_SCHEMA)
 
 
-def ingest_current_trip_data(config: Dict[str, Any], year: int, month: int) -> None:
-    """Download and ingest trip data for the given month."""
+def _ingest_current_trip_data(config: Dict[str, Any], year: int, month: int) -> None:
+    """Download and ingest trip data for the given month, expecting the current schema."""
     _ingest_trip_data(config, year, month, "citibike_trips_current", CURRENT_TRIP_CSV_SCHEMA)
 
 
@@ -74,17 +82,3 @@ def _process_csv_batch(csv_path: str, batch_key_val: str, loader: StagingTableLo
     print(f"added metadata!")
 
     loader.load_and_merge_df(df_metadata, batch_key_val)
-
-# TODO: remove this after development
-if __name__ == "__main__":
-    # Months to test:
-    # - 2024-01: new filename pattern: YYYYMM-citibike-tripdata.zip, contians YYYYMM-citibike-tripdata_N.csv
-    # - 2022-08: old pattern: YYYY-citibike-tripdata.zip, contains YYYYMM-citibike-tripdata.zip, which has YYYYMM-citibike-tripdata_N.csv
-    # - 2019-06: old pattern: YYYY-citibike-tripdata.zip, contains 06_June which has YYYYMM-citibike-tripdata_N.csv
-    year, month = 2020, 1
-    config = load_config("dev")
-
-    print(f"Starting ingestion for {year}-{month:02d}")
-    # ingest_legacy_trip_data(config, year, month)
-    ingest_current_trip_data(config, year, month)
-    print("Ingestion completed successfully!")
