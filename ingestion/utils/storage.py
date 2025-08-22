@@ -1,7 +1,5 @@
 from abc import ABC, abstractmethod
-import os
 from pathlib import Path
-import shutil
 from typing import List
 
 class StorageLocation(ABC):

@@ -21,7 +21,7 @@ def ingest_current_trip_data(config: Dict[str, Any], year: int, month: int) -> N
     loader = StagingTableLoader(client, table_id, "_batch_key", "ride_id")
 
     # Download and extract CSV files
-    downloader = TripDataDownloader(storage)
+    downloader = TripDataDownloader(storage, config["TRIP_DATA_URL"])
     csv_paths = downloader.download_month(year, month)
     print(f"Downloaded CSV files to paths {csv_paths}")
 

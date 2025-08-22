@@ -3,13 +3,13 @@ import requests
 import zipfile
 from typing import List
 
-from utils.storage import StorageLocation
+from .storage import StorageLocation
 
 class TripDataDownloader:
-    def __init__(self, storage: StorageLocation):
+    def __init__(self, storage: StorageLocation, base_url: str):
         self.storage = storage
-        self.base_url = "https://s3.amazonaws.com/tripdata/"
-    
+        self.base_url = base_url
+
     def download_month(self, year: int, month: int) -> List[str]:
         if year < 2024:
             raise ValueError(f"Year {year} not supported yet (pre-2024 format)")
