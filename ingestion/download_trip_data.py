@@ -42,27 +42,8 @@ def ingest_legacy_trip_data(config: Dict[str, Any], year: int, month: int) -> No
 
 def ingest_current_trip_data(config: Dict[str, Any], year: int, month: int) -> None:
     """Download and ingest trip data for the given month."""
+    _ingest_trip_data(config, year, month, "citibike_trips_current", CURRENT_TRIP_CSV_SCHEMA)
 
-    # Initialize components
-    storage = LocalStorage()
-    client = initialize_bigquery_client(config)
-    table_id = f"{config['GCP_PROJECT_ID']}.{config['BQ_DATASET_RAW']}.citibike_trips_current"
-    loader = StagingTableLoader(client, table_id, "_batch_key")
-
-    # Download and extract CSV files
-    downloader = TripDataDownloader(storage, config["TRIP_DATA_URL"])
-    csv_paths = downloader.download_month(year, month)
-    print(f"Downloaded CSV files to paths {csv_paths}")
-
-    # Process each CSV file as a separate batch
-    for csv_path in csv_paths:
-        batch_key = _extract_batch_key_from_filename(csv_path)
-        _process_csv_batch(csv_path, batch_key, loader, CURRENT_TRIP_CSV_SCHEMA)
-    
-    # Clean up downloaded files
-    storage.cleanup(csv_paths)
-
-    print(f"Successfully ingested trip data for {year}-{month:02d}")
 
 def _extract_batch_key_from_filename(csv_path: str) -> str:
     filename = os.path.basename(csv_path)
@@ -100,9 +81,10 @@ if __name__ == "__main__":
     # - 2024-01: new filename pattern: YYYYMM-citibike-tripdata.zip, contians YYYYMM-citibike-tripdata_N.csv
     # - 2022-08: old pattern: YYYY-citibike-tripdata.zip, contains YYYYMM-citibike-tripdata.zip, which has YYYYMM-citibike-tripdata_N.csv
     # - 2019-06: old pattern: YYYY-citibike-tripdata.zip, contains 06_June which has YYYYMM-citibike-tripdata_N.csv
-    year, month = 2015, 6
+    year, month = 2020, 1
     config = load_config("dev")
 
     print(f"Starting ingestion for {year}-{month:02d}")
-    ingest_legacy_trip_data(config, year, month)
+    # ingest_legacy_trip_data(config, year, month)
+    ingest_current_trip_data(config, year, month)
     print("Ingestion completed successfully!")
