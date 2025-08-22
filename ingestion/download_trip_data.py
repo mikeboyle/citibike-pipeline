@@ -11,6 +11,9 @@ from utils.config import load_config
 from utils.bigquery import initialize_bigquery_client
 
 
+def ingest_legacy_trip_data(config: Dict[str, Any], year: int, month: int) -> None:
+    pass
+
 def ingest_current_trip_data(config: Dict[str, Any], year: int, month: int) -> None:
     """Download and ingest trip data for the given month."""
 
@@ -18,7 +21,7 @@ def ingest_current_trip_data(config: Dict[str, Any], year: int, month: int) -> N
     storage = LocalStorage()
     client = initialize_bigquery_client(config)
     table_id = f"{config['GCP_PROJECT_ID']}.{config['BQ_DATASET_RAW']}.citibike_trips_current"
-    loader = StagingTableLoader(client, table_id, "_batch_key", "ride_id")
+    loader = StagingTableLoader(client, table_id, "_batch_key")
 
     # Download and extract CSV files
     downloader = TripDataDownloader(storage, config["TRIP_DATA_URL"])

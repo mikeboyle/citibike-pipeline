@@ -59,7 +59,7 @@ def ingest_station_data(config: Dict[str, Any], batch_date: datetime) -> None:
     table_id = f"{config['GCP_PROJECT_ID']}.{config['BQ_DATASET_RAW']}.citibike_stations"
 
     # Insert the rows
-    loader = StagingTableLoader(client, table_id, "_ingested_at", "station_id")
+    loader = StagingTableLoader(client, table_id, "_ingested_at")
     loader.load_and_merge_df(df, batch_key_value)
     
     print(f"Successfully inserted {len(rows)} station records")
