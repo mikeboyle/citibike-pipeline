@@ -5,12 +5,11 @@ class StagingTableLoader:
     """
     TODO: Docstring
     """
-    def __init__(self, client: bigquery.Client, main_table_id: str, batch_key_column: str, primary_key_column: str, staging_table_suffix: str = "_staging"):
+    def __init__(self, client: bigquery.Client, main_table_id: str, batch_key_column: str, staging_table_suffix: str = "_staging"):
         self.client = client
         self.main_table_id = main_table_id
         self.staging_table_id = f"{main_table_id}{staging_table_suffix}"
         self.batch_key_column = batch_key_column
-        self.primary_key_column = primary_key_column
     
     def load_and_merge_df(self, df: pd.DataFrame, batch_key_value: str) -> None:
         self._load_df_to_staging(df)

@@ -23,3 +23,29 @@ CURRENT_TRIP_BQ_SCHEMA = {
     '_ingested_at': 'datetime64[ns]',
     '_batch_key': 'string',
 }
+
+# What we expect from Citibike CSV files (pre 2020)
+LEGACY_TRIP_CSV_SCHEMA: Dict[str, Any] = {
+    'tripduration': 'Int64',
+    'starttime': 'datetime64[ns]',
+    'stoptime': 'datetime64[ns]',
+    'start station id': 'string',
+    'start station name': 'string',
+    'start station latitude': 'float64',
+    'start station longitude': 'float64',
+    'end station id': 'string',
+    'end station name': 'string',
+    'end station latitude': 'float64',
+    'end station longitude': 'float64',
+    'bikeid': 'Int64',
+    'usertype': 'string',
+    'birth year': 'Int64',
+    'gender': 'Int64',
+}
+
+# What we store in BigQuery (CSV + our metadata)
+LEGACY_TRIP_BQ_SCHEMA = {
+    **LEGACY_TRIP_CSV_SCHEMA,
+    '_ingested_at': 'datetime64[ns]',
+    '_batch_key': 'string',
+}
