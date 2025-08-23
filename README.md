@@ -76,7 +76,8 @@ A modern data stack implementation using Citibike trip and station data.
    - Copy `config/dev.env.example` to `config/dev.env`
    - Copy `config/dev.env.example` `config/prod.env`
    - Update `GCP_PROJECT_ID` in both files with your actual project ID
-   - Verify `GOOGLE_APPLICATION_CREDENTIALS` points to your JSON file path
+   - Update `GOOGLE_APPLICATION_CREDENTIALS` to the **absolute** path to your `service-account.json` credentials
+
 
 ### 3. Create BigQuery tables
 
@@ -89,6 +90,16 @@ A modern data stack implementation using Citibike trip and station data.
 2. **Manually verify**
    Go to the BigQuery console and confirm that the expected tables were created with the columns and datatypes you expect.
 
-### 4. Next Steps
+### 4. Configure DBT
+1. **Configure profile**
+   - **In the project root**, run `generate_dbt_profile.py`
+   - This should create the file `dbt_transformations/profiles.yml`
+
+2. **Test dbt connection to BigQuery**
+   - `cd dbt_transformations`
+   - `dbt debug` # tests dev environment
+   - `dbt debug --target prod` # tests prod environment
+
+### 5. Next Steps
 TODO: Add instructions for ingestion scripts, dbt models, and Airflow setup as they are built.
 
