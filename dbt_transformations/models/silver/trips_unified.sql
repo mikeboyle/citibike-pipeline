@@ -11,8 +11,16 @@
 
 WITH unified_base AS (
     SELECT * FROM {{ ref('stg_trips_legacy') }}
+    {% if is_incremental() %}
+    WHERE _batch_key LIKE '{{ var("month_key") }}%'
+    {% endif %}
+
     UNION ALL
+
     SELECT * FROM {{ ref('stg_trips_current') }}
+    {% if is_incremental() %}
+    WHERE _batch_key LIKE '{{ var("month_key") }}%'
+    {% endif %}
 )
 
 -- Final SELECT with enrichments
