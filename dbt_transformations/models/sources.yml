@@ -25,3 +25,16 @@ sources:
             description: "Trip end timestamp" 
           - name: _batch_key
             description: "Batch identifier for incremental processing"
+      - name: citibike_stations
+        description: "Station data from GBFS feed"
+        columns:
+          - name: station_id
+            description: "Unique id of station"
+          - name: station_data
+            description: "JSON string of station data from GBFS"
+          - name: api_last_updated
+            description: "Timestamp of last update to stations"
+          - name: api_version
+            desccription: "GBFS api version"
+          - name: _ingested_at
+            description: "When the GBFS data was accessed"
