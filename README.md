@@ -76,7 +76,8 @@ A modern data stack implementation using Citibike trip and station data.
    - Copy `config/dev.env.example` to `config/dev.env`
    - Copy `config/dev.env.example` `config/prod.env`
    - Update `GCP_PROJECT_ID` in both files with your actual project ID
-   - Verify `GOOGLE_APPLICATION_CREDENTIALS` points to your JSON file path
+   - Update `GOOGLE_APPLICATION_CREDENTIALS` to the **absolute** path to your `service-account.json` credentials
+
 
 ### 3. Create BigQuery tables
 
