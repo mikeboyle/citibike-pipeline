@@ -45,7 +45,7 @@ SELECT
     `birth year` as birth_year,
 
     -- Columns found only in current schema
-    NULL as rideable_type,
+    CAST(NULL AS STRING) as rideable_type,
 
     -- Debugging columns (preserve original station IDs)
     `start station id` as legacy_start_station_id,

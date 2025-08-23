@@ -25,16 +25,16 @@ SELECT
     member_casual,
     
     -- Legacy-only columns (NULL for current)
-    NULL as gender,
-    NULL as bike_id,
+    CAST(NULL AS STRING) as gender,
+    CAST(NULL AS STRING) as bike_id,
     NULL as birth_year,
 
     -- Current-only columns
     rideable_type,
     
     -- Debugging columns (NULL for current)
-    NULL as legacy_start_station_id,
-    NULL as legacy_end_station_id,
+    CAST(NULL AS STRING) as legacy_start_station_id,
+    CAST(NULL AS STRING) as legacy_end_station_id,
     
     -- Metadata
     'current' as data_source_schema,
