@@ -1,0 +1,27 @@
+version: 2
+
+sources:
+  - name: raw
+    description: "Raw Citibike data ingested via custom pipeline"
+    database: "{{ target.project }}"
+    schema: "{{ 'raw' if target.name == 'prod' else 'raw_dev' }}"
+    tables:
+      - name: citibike_trips_legacy
+        description: "Legacy trip data (2013-2019) with original schema"
+        columns:
+          - name: starttime
+            description: "Trip start timestamp"
+          - name: stoptime  
+            description: "Trip end timestamp"
+          - name: _batch_key
+            description: "Batch identifier for incremental processing"
+            
+      - name: citibike_trips_current
+        description: "Current trip data (2020+) with updated schema"  
+        columns:
+          - name: started_at
+            description: "Trip start timestamp"
+          - name: ended_at
+            description: "Trip end timestamp" 
+          - name: _batch_key
+            description: "Batch identifier for incremental processing"

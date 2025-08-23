@@ -5,6 +5,10 @@
 name: 'citibike_pipeline_dbt'
 version: '1.0.0'
 
+# Variables
+vars:
+  raw_dataset: "{{ 'raw' if target.name == 'prod' else 'raw_dev' }}"
+
 # This setting configures which "profile" dbt uses for this project.
 profile: 'dbt_transformations'
 
