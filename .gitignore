@@ -28,9 +28,12 @@ venv/
 .venv/
 
 # dbt
-dbt/target/
-dbt/dbt_packages/
-dbt/logs/
+dbt_transformations/target/
+dbt_transformations/dbt_packages/
+dbt_transformations/logs/
+dbt_transformations/profiles.yml
+dbt_transformations/.user.yml
+logs/dbt.log
 
 # Airflow
 airflow/logs/*
