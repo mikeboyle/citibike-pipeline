@@ -88,11 +88,11 @@ legacy_trips_with_enriched_ids AS (
     FROM
         legacy_trips_normalized t
     LEFT JOIN
-        {{ ref('stations') }} s_start
+        {{ ref('silver_stations') }} s_start
     ON
         LOWER(TRIM(t.start_station_name)) = LOWER(TRIM(s_start.name))
     LEFT JOIN
-        {{ ref('stations') }} s_end
+        {{ ref('silver_stations') }} s_end
     ON
         LOWER(TRIM(t.end_station_name)) = LOWER(TRIM(s_end.name))
 )
