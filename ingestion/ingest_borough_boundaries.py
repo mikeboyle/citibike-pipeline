@@ -21,12 +21,13 @@ def ingest_borough_boundaries(config: Dict[str, Any]):
 
     # Prepare rows for BigQuery (one row per borough)
     rows = []
+    batch_key = datetime.now(timezone.utc).isoformat()
     for feature in geojson_data["features"]:
         rows.append({
             "borough_code": int(feature["properties"]["BoroCode"]),
             "borough_name": feature["properties"]["BoroName"],
             "feature_geojson": json.dumps(feature), # Store complete feature
-            "_ingested_at": datetime.now(timezone.utc).isoformat(),
+            "_ingested_at": batch_key,
         })
     
     print(f"Prepared {len(rows)} borough boundaries for ingestion")
