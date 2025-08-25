@@ -7,7 +7,7 @@
 
 WITH latest_data_date AS (
     SELECT MAX(DATE(started_at)) as max_date
-    FROM {{ ref('trips_unified') }}
+    FROM {{ ref('silver_trips') }}
 ),
 
 date_range AS (
@@ -19,7 +19,7 @@ date_range AS (
 
 station_activity AS (
     SELECT start_station_id as station_id, COUNT(*) as starts, 0 as ends
-    FROM {{ ref('trips_unified') }}
+    FROM {{ ref('silver_trips') }}
     WHERE DATE(started_at) >= (SELECT start_date from date_range)
         AND NOT {{ is_geographic_outlier('start_lat', 'start_lng') }}
         AND NOT {{ is_geographic_outlier('end_lat', 'end_lng') }}
@@ -28,7 +28,7 @@ station_activity AS (
     UNION ALL
   
     SELECT end_station_id as station_id, 0 as starts, COUNT(*) as ends  
-    FROM {{ ref('trips_unified') }}
+    FROM {{ ref('silver_trips') }}
     WHERE DATE(started_at) >= (SELECT start_date from date_range)
         AND NOT {{ is_geographic_outlier('start_lat', 'start_lng') }}
         AND NOT {{ is_geographic_outlier('end_lat', 'end_lng') }}
