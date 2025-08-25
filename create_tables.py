@@ -4,7 +4,7 @@ import sys
 
 
 ENV_NAMES = ["dev", "prod"]
-TABLE_NAMES = ["nyc_borough_boundaries", "citibike_stations", "citibike_trips_current", "citibike_trips_legacy"]
+TABLE_NAMES = ["raw_nyc_borough_boundaries", "raw_stations", "raw_trips_current", "raw_trips_legacy"]
 TABLE_SUFFIXES = ["", "_staging"]
 
 def populate_create_table_query(template_string: str, 
@@ -27,13 +27,13 @@ def run() -> None:
         env_name = sys.argv[1]
     
     config = load_config(env_name)
-    dataset_name = config.get("BQ_DATASET_RAW")
+    dataset_name = config.get("BQ_DATASET")
     project_id = config.get("GCP_PROJECT_ID")
 
     client = initialize_bigquery_client(config)
 
     if not dataset_name or not project_id:
-        raise Exception(f"Config missing values for BQ_DATASET_RAW or GCP_PROJECT_ID. Config = {config}")
+        raise Exception(f"Config missing values for BQ_DATASET or GCP_PROJECT_ID. Config = {config}")
 
     # Prepare list of tables that will be created
     tables_to_create = [f"`{project_id}.{dataset_name}.{table_name}{suffix}`" for table_name in TABLE_NAMES for suffix in TABLE_SUFFIXES]
@@ -50,8 +50,6 @@ def run() -> None:
     
     # Actually create the tables
     for table_name in TABLE_NAMES:
-        print(f"Preparing create table queries for {dataset_name}.{table_name}{TABLE_SUFFIXES[0]} and {dataset_name}.{table_name}{TABLE_SUFFIXES[1]}...")
-
         template_file = f"sql/ddl/templates/raw/{table_name}.sql"
         
         with open(template_file, "r") as f_in:
@@ -59,6 +57,10 @@ def run() -> None:
         
         for suffix in TABLE_SUFFIXES:
             query = populate_create_table_query(template_string, project_id, dataset_name, suffix)
+
+            print("\n========================================")
+            print(f"{dataset_name}.{table_name}{suffix}")
+            print("========================================\n")
         
             print("The following SQL will be run on BigQuery:")
             for line in query.split("\n"):

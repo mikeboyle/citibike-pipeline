@@ -1,7 +1,7 @@
 import yaml
 import sys
 
-from ingestion.utils.config import load_config
+from citibike.config import load_config
 
 def generate_profile():
     try:
@@ -16,7 +16,7 @@ def generate_profile():
         'dbt_transformations': {
             'outputs': {
                 'dev': {
-                    'dataset': dev_config.get('BQ_DATASET_SILVER', 'silver_dev'),
+                    'dataset': dev_config.get('BQ_DATASET', 'citibike_dev'),
                     'job_execution_timeout_seconds': 300,
                     'job_retries': 1,
                     'keyfile': dev_config['GOOGLE_APPLICATION_CREDENTIALS'],
@@ -28,7 +28,7 @@ def generate_profile():
                     'type': 'bigquery',
                 },
                 'prod': {
-                    'dataset': prod_config.get('BQ_DATASET_SILVER', 'silver'),
+                    'dataset': prod_config.get('BQ_DATASET', 'citibike'),
                     'job_execution_timeout_seconds': 600,  # Longer timeout in prod
                     'job_retries': 1,
                     'keyfile': prod_config['GOOGLE_APPLICATION_CREDENTIALS'],

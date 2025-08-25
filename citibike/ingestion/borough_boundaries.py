@@ -34,7 +34,7 @@ def ingest_borough_boundaries(config: Dict[str, Any]):
 
     # Insert to BigQuery
     client = initialize_bigquery_client(config)
-    table_id = f"{config['GCP_PROJECT_ID']}.{config['BQ_DATASET_RAW']}.nyc_borough_boundaries"
+    table_id = f"{config['GCP_PROJECT_ID']}.{config['BQ_DATASET']}.raw_nyc_borough_boundaries"
 
     errors = client.insert_rows_json(table_id, rows)
     if errors:

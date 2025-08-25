@@ -4,9 +4,9 @@ sources:
   - name: raw
     description: "Raw Citibike data ingested via custom pipeline"
     database: "{{ target.project }}"
-    schema: "{{ 'raw' if target.name == 'prod' else 'raw_dev' }}"
+    schema: "{{ 'citibike' if target.name == 'prod' else 'citibike_dev' }}"
     tables:
-      - name: citibike_trips_legacy
+      - name: raw_trips_legacy
         description: "Legacy trip data (2013-2019) with original schema"
         columns:
           - name: starttime
@@ -16,7 +16,7 @@ sources:
           - name: _batch_key
             description: "Batch identifier for incremental processing"
             
-      - name: citibike_trips_current
+      - name: raw_trips_current
         description: "Current trip data (2020+) with updated schema"  
         columns:
           - name: started_at
@@ -25,7 +25,7 @@ sources:
             description: "Trip end timestamp" 
           - name: _batch_key
             description: "Batch identifier for incremental processing"
-      - name: citibike_stations
+      - name: raw_stations
         description: "Station data from GBFS feed"
         columns:
           - name: station_id
@@ -38,7 +38,7 @@ sources:
             desccription: "GBFS api version"
           - name: _ingested_at
             description: "When the GBFS data was accessed"
-      - name: nyc_borough_boundaries
+      - name: raw_nyc_borough_boundaries
         description: "Geojson data for NYC borough boundaries"
         columns:
           - name: borough_code

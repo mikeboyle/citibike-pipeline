@@ -18,7 +18,7 @@ WITH parsed_stations AS (
         api_last_updated,
         api_version,
         _ingested_at
-    FROM {{ source('raw', 'citibike_stations') }}
+    FROM {{ source('raw', 'raw_stations') }}
 
 ),
 
@@ -59,6 +59,6 @@ SELECT
 FROM
     deduplicated_stations l
 LEFT JOIN
-    {{ ref('silver_borough_boundaries') }} bb
+    {{ ref('silver_nyc_borough_boundaries') }} bb
 ON
     ST_WITHIN(ST_GEOGPOINT(l.lon, l.lat), bb.boundary_polygon)
