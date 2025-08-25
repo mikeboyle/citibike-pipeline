@@ -1,6 +1,5 @@
-from utils.config import load_config
-from utils.bigquery import initialize_bigquery_client
-from utils.staging import StagingTableLoader
+from citibike.database.bigquery import initialize_bigquery_client
+from citibike.database.staging import StagingTableLoader
 
 import requests
 import json
@@ -63,10 +62,3 @@ def ingest_station_data(config: Dict[str, Any], batch_date: datetime) -> None:
     loader.load_and_merge_df(df, batch_key_value)
     
     print(f"Successfully inserted {len(rows)} station records")
-
-
-# TODO: remove this after development
-if __name__ == "__main__":
-    config = load_config("dev")
-    batch_date = datetime(2025, 8, 21)
-    ingest_station_data(config, batch_date)

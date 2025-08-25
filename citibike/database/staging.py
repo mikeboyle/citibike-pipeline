@@ -3,7 +3,8 @@ from google.cloud import bigquery
 
 class StagingTableLoader:
     """
-    TODO: Docstring
+    Loads a dataframe to a staging table in big query,
+    and then merges the staging data into the main table.
     """
     def __init__(self, client: bigquery.Client, main_table_id: str, batch_key_column: str, staging_table_suffix: str = "_staging"):
         self.client = client
@@ -43,21 +44,6 @@ class StagingTableLoader:
         """
         Replaces the data in the main table with the given batch_key_value with
         the corresponding data in the staging table.
-
-        This is implemented currently by deleting the batch from the main table, then
-        inserting the batch from the staging table. In a future iteration, this will be an
-        atomic MERGE INTO operation that dynamically sets all of the column values in the
-        destination table. To limit code complexity for the moment, this is currently implemented
-        with the delete + insert strategy.
-        
-        Although this is not an atomic operation, in the context of an ETL pipeline this should 
-        be okay for the time being. Reads and writes to the main table do not happen simultaneously
-        because they are controlled by the orchestration layer, so no consumer of the table will get
-        the wrong information by reading in between the delete and update steps. In addition, if the 
-        delete step fails, the error will interrupt code execution and the insert will not be attempted.
-        When re-running the operation, the staging table will be overwritten (so no duplicate data),
-        the delete step would simply be a no-op (nothing to delete), so a successful insert step would 
-        have the correct result.
         """
         try:
             # Step 1: Delete existing batch
