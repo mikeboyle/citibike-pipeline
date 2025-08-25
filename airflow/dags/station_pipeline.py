@@ -12,4 +12,5 @@ if __name__ == "__main__":
     ingest_station_data(config, ingestion_date)
 
     print("Stage 2: Transform row stations to silver stations")
-    run_dbt_command("dbt run --select +silver_stations")
+    dbt_command = "dbt run --select +silver_stations"
+    run_dbt_command(dbt_command.split())
