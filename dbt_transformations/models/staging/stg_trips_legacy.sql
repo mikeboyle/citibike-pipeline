@@ -87,14 +87,26 @@ legacy_trips_with_enriched_ids AS (
 
     FROM
         legacy_trips_normalized t
-    LEFT JOIN
-        {{ ref('silver_stations') }} s_start
+    LEFT JOIN (
+        SELECT
+            -- allow only one row to be joined to the trip (not 2 or more)
+            LOWER(TRIM(name)) AS clean_name,
+            ANY_VALUE(short_name) AS short_name
+        FROM {{ ref('silver_stations') }}
+        GROUP BY LOWER(TRIM(name)) 
+    ) s_start
     ON
-        LOWER(TRIM(t.start_station_name)) = LOWER(TRIM(s_start.name))
-    LEFT JOIN
-        {{ ref('silver_stations') }} s_end
+        LOWER(TRIM(t.start_station_name)) = s_start.clean_name
+    LEFT JOIN (
+        SELECT
+            -- allow only one row to be joined to the trip (not 2 or more)
+            LOWER(TRIM(name)) AS clean_name,
+            ANY_VALUE(short_name) AS short_name
+        FROM {{ ref('silver_stations') }}
+        GROUP BY LOWER(TRIM(name)) 
+    ) s_end
     ON
-        LOWER(TRIM(t.end_station_name)) = LOWER(TRIM(s_end.name))
+        LOWER(TRIM(t.end_station_name)) = s_end.clean_name
 )
 
 SELECT * FROM legacy_trips_with_enriched_ids
