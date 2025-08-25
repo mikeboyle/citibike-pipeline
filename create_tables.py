@@ -1,5 +1,5 @@
-from ingestion.utils.config import load_config
-from ingestion.utils.bigquery import initialize_bigquery_client
+from citibike.config import load_config
+from citibike.database.bigquery import initialize_bigquery_client
 import sys
 
 
