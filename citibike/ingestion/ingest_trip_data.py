@@ -2,13 +2,12 @@ import os
 import pandas as pd
 from typing import Any, Dict
 
-from utils.validation import add_metadata_columns, validate_and_cast_trip_schema
-from utils.schemas import CURRENT_TRIP_CSV_SCHEMA, LEGACY_TRIP_CSV_SCHEMA
-from utils.storage import LocalStorage
-from utils.trips import TripDataDownloader
-from utils.staging import StagingTableLoader
-from utils.config import load_config
-from utils.bigquery import initialize_bigquery_client
+from citibike.ingestion.validation import add_metadata_columns, validate_and_cast_trip_schema
+from citibike.ingestion.schemas import CURRENT_TRIP_CSV_SCHEMA, LEGACY_TRIP_CSV_SCHEMA
+from citibike.utils.storage import LocalStorage
+from citibike.ingestion.trips import TripDataDownloader
+from citibike.database.staging import StagingTableLoader
+from citibike.database.bigquery import initialize_bigquery_client
 
 
 def ingest_trip_data(config: Dict[str, Any], year: int, month: int):

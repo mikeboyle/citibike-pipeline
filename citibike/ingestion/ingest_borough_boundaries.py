@@ -3,8 +3,8 @@ import requests
 import json
 from datetime import datetime, timezone
 
-from utils.config import load_config
-from utils.bigquery import initialize_bigquery_client
+from citibike.config import load_config
+from citibike.database.bigquery import initialize_bigquery_client
 
 def ingest_borough_boundaries(config: Dict[str, Any]):
     """Fetch NYC borough boundaries and load to BigQuery raw table"""

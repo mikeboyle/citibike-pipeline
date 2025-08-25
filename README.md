@@ -52,11 +52,6 @@ A modern data stack implementation using Citibike trip and station data.
 5. **Save Credentials**
    - Save the JSON key as `config/service-account.json`
 
-6. **Create Config Template**
-   ```bash
-   cp config/dev.env.example config/dev.env
-   cp config/dev.env.example config/prod.env
-   ```
 
 ### 2. Local Environment Setup
 
@@ -68,8 +63,10 @@ A modern data stack implementation using Citibike trip and station data.
 
 2. **Install Dependencies**
    ```bash
+   cd root/dir/of/reop
    pip install --upgrade pip
    pip install -r requirements.txt
+   pip install -e . # Install project package
    ```
 
 3. **Configure Environment-Dependent Parameters**

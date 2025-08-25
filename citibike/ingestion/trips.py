@@ -5,7 +5,7 @@ from typing import List
 from pathlib import Path
 import re
 
-from .storage import StorageLocation
+from citibike.utils.storage import StorageLocation
 
 class TripDataDownloader:
     def __init__(self, storage: StorageLocation, base_url: str):
