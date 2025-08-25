@@ -20,12 +20,35 @@ WITH parsed_stations AS (
         _ingested_at
     FROM {{ source('raw', 'citibike_stations') }}
 
+),
+
+latest_stations AS (
+    SELECT *
+    FROM parsed_stations
+    QUALIFY 
+        ROW_NUMBER() OVER (
+            PARTITION BY station_id
+            ORDER BY _ingested_at DESC
+        ) = 1
+),
+
+max_ingestion_time AS (
+    SELECT MAX(_ingested_at) as max_ingested_at
+    FROM latest_stations
 )
 
-SELECT *
-FROM parsed_stations
-QUALIFY 
-    ROW_NUMBER() OVER (
-        PARTITION BY station_id
-        ORDER BY _ingested_at DESC
-    ) = 1
+SELECT
+    l.*,
+    COALESCE(
+        bb.borough_name,
+        (
+            CASE WHEN l.region_id IN ('70', '311') THEN 'NJ'
+            ELSE 'Unknown' END
+        )
+    ) AS borough
+FROM
+    latest_stations l
+LEFT JOIN
+    {{ ref('silver_borough_boundaries') }} bb
+ON
+    ST_WITHIN(ST_GEOGPOINT(l.lon, l.lat), bb.boundary_polygon)

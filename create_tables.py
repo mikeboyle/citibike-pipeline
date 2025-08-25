@@ -4,7 +4,7 @@ import sys
 
 
 ENV_NAMES = ["dev", "prod"]
-TABLE_NAMES = ["citibike_stations", "citibike_trips_current", "citibike_trips_legacy"]
+TABLE_NAMES = ["nyc_borough_boundaries", "citibike_stations", "citibike_trips_current", "citibike_trips_legacy"]
 TABLE_SUFFIXES = ["", "_staging"]
 
 def populate_create_table_query(template_string: str, 

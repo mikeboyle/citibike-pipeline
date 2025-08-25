@@ -38,3 +38,14 @@ sources:
             desccription: "GBFS api version"
           - name: _ingested_at
             description: "When the GBFS data was accessed"
+      - name: nyc_borough_boundaries
+        description: "Geojson data for NYC borough boundaries"
+        columns:
+          - name: borough_code
+            description: "1 = Manhattan, 2 = Bronx, 3 = Brooklyn, 4 = Queens, 5 = Staten Island"
+          - name: borough_name
+            description: "Name of the borough"
+          - name: feature_geojson
+            description: "JSON dump of complete geojson feature as string"
+          - name: _ingested_at
+            description: "When the data was accessed"
