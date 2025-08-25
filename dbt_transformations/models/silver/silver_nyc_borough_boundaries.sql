@@ -9,9 +9,9 @@ SELECT
     ST_GEOGFROMGEOJSON(JSON_EXTRACT(feature_geojson, '$.geometry')) AS boundary_polygon,
     _ingested_at
 FROM
-    {{ source('raw', 'nyc_borough_boundaries' )}}
+    {{ source('raw', 'raw_nyc_borough_boundaries' )}}
 WHERE
     _ingested_at = (
         SELECT MAX(_ingested_at)
-        FROM {{ source('raw', 'nyc_borough_boundaries' )}}
+        FROM {{ source('raw', 'raw_nyc_borough_boundaries' )}}
     )

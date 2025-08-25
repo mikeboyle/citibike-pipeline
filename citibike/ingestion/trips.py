@@ -23,7 +23,7 @@ def _ingest_trip_data(config: Dict[str, Any], year: int, month: int, table_name:
     # Initialize components
     storage = LocalStorage()
     client = initialize_bigquery_client(config)
-    table_id = f"{config['GCP_PROJECT_ID']}.{config['BQ_DATASET_RAW']}.{table_name}"
+    table_id = f"{config['GCP_PROJECT_ID']}.{config['BQ_DATASET']}.{table_name}"
     loader = StagingTableLoader(client, table_id, "_batch_key")
 
     # Download and extract CSV files
@@ -44,12 +44,12 @@ def _ingest_trip_data(config: Dict[str, Any], year: int, month: int, table_name:
 
 def _ingest_legacy_trip_data(config: Dict[str, Any], year: int, month: int) -> None:
     """Download and ingest trip data for the given month, expecting the legacy schema."""
-    _ingest_trip_data(config, year, month, "citibike_trips_legacy", LEGACY_TRIP_CSV_SCHEMA)
+    _ingest_trip_data(config, year, month, "raw_trips_legacy", LEGACY_TRIP_CSV_SCHEMA)
 
 
 def _ingest_current_trip_data(config: Dict[str, Any], year: int, month: int) -> None:
     """Download and ingest trip data for the given month, expecting the current schema."""
-    _ingest_trip_data(config, year, month, "citibike_trips_current", CURRENT_TRIP_CSV_SCHEMA)
+    _ingest_trip_data(config, year, month, "raw_trips_current", CURRENT_TRIP_CSV_SCHEMA)
 
 
 def _extract_batch_key_from_filename(csv_path: str) -> str:
@@ -70,8 +70,10 @@ def _process_csv_batch(csv_path: str, batch_key_val: str, loader: StagingTableLo
     print(f"processing csv at path {csv_path}, batch_key_value = {batch_key_val}")
     df_raw = pd.read_csv(csv_path)
 
-    # TEMPORARY: Limit to first 100 rows for testing
-    df_raw = df_raw.head(100)
+    # ========================================
+    # TEMPORARY: Limit to first 1000 rows for testing
+    df_raw = df_raw.head(1000)
+    # ========================================
     print(f"DEBUG: Limited to {len(df_raw)} rows for testing")
 
     df_validated = validate_and_cast_trip_schema(df_raw, schema)

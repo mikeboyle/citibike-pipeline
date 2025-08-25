@@ -57,7 +57,7 @@ WITH legacy_trips_normalized AS (
         _ingested_at,
         _batch_key
 
-    FROM {{ source('raw', 'citibike_trips_legacy') }}
+    FROM {{ source('raw', 'raw_trips_legacy') }}
 ),
 
 legacy_trips_with_enriched_ids AS (

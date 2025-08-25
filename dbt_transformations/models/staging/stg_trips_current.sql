@@ -41,4 +41,4 @@ SELECT
     _ingested_at,
     _batch_key
     
-FROM {{ source('raw', 'citibike_trips_current') }}
+FROM {{ source('raw', 'raw_trips_current') }}

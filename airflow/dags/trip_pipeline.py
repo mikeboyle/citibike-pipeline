@@ -1,6 +1,5 @@
 import sys
 import json
-from typing import LiteralString
 
 from citibike.config import load_config
 from citibike.ingestion.trips import ingest_trip_data
@@ -30,7 +29,7 @@ def run():
 
     print(f"Stage 2: Transform raw trips to silver trips")
     dbt_vars = json.dumps({ "month_key": month_key })
-    dbt_command = ["dbt", "run", "--select", "+trips_unified", "--vars", dbt_vars]
+    dbt_command = ["dbt", "run", "--select", "+silver_trips", "--vars", dbt_vars]
     run_dbt_command(dbt_command)
 
 

@@ -55,7 +55,7 @@ def ingest_station_data(config: Dict[str, Any], batch_date: datetime) -> None:
     client = initialize_bigquery_client(config)
 
     # Build table reference
-    table_id = f"{config['GCP_PROJECT_ID']}.{config['BQ_DATASET_RAW']}.citibike_stations"
+    table_id = f"{config['GCP_PROJECT_ID']}.{config['BQ_DATASET']}.raw_stations"
 
     # Insert the rows
     loader = StagingTableLoader(client, table_id, "_ingested_at")

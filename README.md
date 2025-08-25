@@ -37,9 +37,9 @@ A modern data stack implementation using Citibike trip and station data.
    - Cloud Resource Manager API
 
 3. **Create BigQuery Datasets**
-   Create these 6 datasets in BigQuery:
-   - `raw_dev`, `silver_dev`, `gold_dev` (dev)
-   - `raw`, `silver`, `gold` (production)
+   Create these 2 datasets in BigQuery:
+   - `citibike` (production)
+   - `citibike_dev` (dev)
    
    Use Multi-region US location for all datasets.
 
@@ -71,7 +71,7 @@ A modern data stack implementation using Citibike trip and station data.
 
 3. **Configure Environment-Dependent Parameters**
    - Copy `config/dev.env.example` to `config/dev.env`
-   - Copy `config/dev.env.example` `config/prod.env`
+   - Copy `config/prod.env.example` `config/prod.env`
    - Update `GCP_PROJECT_ID` in both files with your actual project ID
    - Update `GOOGLE_APPLICATION_CREDENTIALS` to the **absolute** path to your `service-account.json` credentials
 
