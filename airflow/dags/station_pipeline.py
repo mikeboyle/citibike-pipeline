@@ -5,12 +5,12 @@ from citibike.ingestion.stations import ingest_station_data
 from citibike.dbt import run_dbt_command
 
 if __name__ == "__main__":
-    config = load_config("dev")
+    config = load_config("dev") # TODO: make this a parameter
     ingestion_date = datetime.now(timezone.utc)
 
     print("Stage 1: Ingest latest GBFS stations data and save to raw")
     ingest_station_data(config, ingestion_date)
 
-    print("Stage 2: Transform row stations to silver stations")
+    print("Stage 2: Transform raw stations to silver stations")
     dbt_command = "dbt run --select +silver_stations"
     run_dbt_command(dbt_command.split())

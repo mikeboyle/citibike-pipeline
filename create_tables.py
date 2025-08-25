@@ -22,7 +22,7 @@ def populate_create_table_query(template_string: str,
 
 def run() -> None:
     if len(sys.argv) < 2 or not sys.argv[1] in ENV_NAMES:
-        raise Exception("Usage: python create_tables.py <dev|prod>")
+        raise SystemExit("Usage: python create_tables.py <dev|prod>")
     else:
         env_name = sys.argv[1]
     
@@ -33,7 +33,7 @@ def run() -> None:
     client = initialize_bigquery_client(config)
 
     if not dataset_name or not project_id:
-        raise Exception(f"Config missing values for BQ_DATASET or GCP_PROJECT_ID. Config = {config}")
+        raise SystemExit(f"Config missing values for BQ_DATASET or GCP_PROJECT_ID. Config = {config}")
 
     # Prepare list of tables that will be created
     tables_to_create = [f"`{project_id}.{dataset_name}.{table_name}{suffix}`" for table_name in TABLE_NAMES for suffix in TABLE_SUFFIXES]
