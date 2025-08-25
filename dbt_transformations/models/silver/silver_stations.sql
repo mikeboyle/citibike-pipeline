@@ -32,6 +32,15 @@ latest_stations AS (
         ) = 1
 ),
 
+deduplicated_stations AS (
+    SELECT *
+    FROM latest_stations
+    QUALIFY ROW_NUMBER() OVER (
+        PARTITION BY LOWER(TRIM(name))
+        ORDER BY station_id
+    ) = 1
+),
+
 max_ingestion_time AS (
     SELECT MAX(_ingested_at) as max_ingested_at
     FROM latest_stations
@@ -45,9 +54,10 @@ SELECT
             CASE WHEN l.region_id IN ('70', '311') THEN 'NJ'
             ELSE 'Unknown' END
         )
-    ) AS borough
+    ) AS borough,
+    l._ingested_at = (SELECT max_ingested_at FROM max_ingestion_time) AS is_active,
 FROM
-    latest_stations l
+    deduplicated_stations l
 LEFT JOIN
     {{ ref('silver_borough_boundaries') }} bb
 ON
