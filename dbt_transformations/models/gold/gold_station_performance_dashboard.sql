@@ -54,7 +54,7 @@ SELECT
     SUM(sa.starts) - SUM(sa.ends) as net_outflow,
     CASE 
         WHEN (SUM(sa.starts) + SUM(sa.ends)) > 0 
-        THEN ROUND(ABS(SUM(sa.starts) - SUM(sa.ends)) / (SUM(sa.starts) + SUM(sa.ends)) * 100, 1)
+        THEN ROUND((SUM(sa.starts) - SUM(sa.ends)) / (SUM(sa.starts) + SUM(sa.ends)) * 100, 1)
         ELSE NULL 
     END as imbalance_pct
 FROM station_activity sa
