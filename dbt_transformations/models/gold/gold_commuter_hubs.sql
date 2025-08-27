@@ -25,6 +25,7 @@ SELECT
   ind.station_id,
   s.name,
   s.borough,
+  s.capacity,
   ind.in_degree,
   outd.out_degree,
   ind.in_degree + outd.out_degree AS total_degree,
