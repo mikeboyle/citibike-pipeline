@@ -22,25 +22,25 @@ out_degree AS (
 )
 
 SELECT
-  ind.station_id,
+  COALESCE(ind.station_id, outd.station_id) AS station_id,
   s.name,
   s.borough,
   s.capacity,
-  ind.in_degree,
-  outd.out_degree,
-  ind.in_degree + outd.out_degree AS total_degree,
-  ind.weighted_in_degree,
-  outd.weighted_out_degree,
-  ind.weighted_in_degree + outd.weighted_out_degree AS weighted_total_degree
+  COALESCE(ind.in_degree, 0) AS in_degree,
+  COALESCE(outd.out_degree, 0) AS out_degree,
+  COALESCE(ind.in_degree, 0) + COALESCE(outd.out_degree, 0) AS total_degree,
+  COALESCE(ind.weighted_in_degree, 0) AS weighted_in_degree,
+  COALESCE(outd.weighted_out_degree, 0) AS weighted_out_degree,
+  COALESCE(ind.weighted_in_degree, 0) + COALESCE(outd.weighted_out_degree, 0) AS weighted_total_degree
 FROM
   in_degree ind
-JOIN
+FULL OUTER JOIN
   out_degree outd
 ON
   ind.station_id = outd.station_id
 LEFT JOIN
   {{ ref('silver_stations') }} s
 ON
-  ind.station_id = s.short_name
+  COALESCE(ind.station_id, outd.station_id) = s.short_name
 ORDER BY
   weighted_total_degree DESC, s.name
