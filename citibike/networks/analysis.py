@@ -51,7 +51,7 @@ class CommuterNetworkAnalyzer:
         
         return G
     
-    def calculate_centrality_metrics(self, station_graph: nx.DiGraph) -> dict:
+    def _calculate_centrality_metrics(self, station_graph: nx.DiGraph) -> dict:
         """Calculate centrality measures for network importance ranking"""
 
         return {
@@ -122,7 +122,7 @@ class CommuterNetworkAnalyzer:
 
         # Find centrality measures
         station_graph = self._build_graph(hubs_df, edges_df)
-        centrality_metrics = self.calculate_centrality_metrics(station_graph)
+        centrality_metrics = self._calculate_centrality_metrics(station_graph)
 
         # Format results as DataFrame for BigQuery
         return self._format_analysis_results(hubs_df, critical_nodes, bottleneck_nodes, centrality_metrics)
