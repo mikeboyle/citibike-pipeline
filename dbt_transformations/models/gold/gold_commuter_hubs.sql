@@ -23,6 +23,8 @@ out_degree AS (
 
 SELECT
   COALESCE(ind.station_id, outd.station_id) AS station_id,
+  s.lat,
+  s.lon,
   s.name,
   s.borough,
   s.capacity,
