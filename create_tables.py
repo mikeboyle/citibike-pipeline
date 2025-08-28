@@ -1,10 +1,12 @@
 from citibike.config import load_config
 from citibike.database.bigquery import initialize_bigquery_client
 import sys
-
+from glob import glob
+from pathlib import Path
 
 ENV_NAMES = ["dev", "prod"]
-TABLE_NAMES = ["raw_nyc_borough_boundaries", "raw_stations", "raw_trips_current", "raw_trips_legacy"]
+TEMPLATE_PATHS = glob("sql/ddl/templates/**/*.sql", recursive=True)
+TABLE_NAMES = [Path(path).stem for path in TEMPLATE_PATHS]
 TABLE_SUFFIXES = ["", "_staging"]
 
 def populate_create_table_query(template_string: str, 
@@ -41,7 +43,7 @@ def run() -> None:
     for table_to_create in tables_to_create:
         print(table_to_create)
     
-    print("Enter y to proceed, any other key to abort")
+    print("Enter y to proceed, or enter any other key to abort")
     should_proceed = input()
 
     if should_proceed != "y":
@@ -49,10 +51,10 @@ def run() -> None:
         return
     
     # Actually create the tables
-    for table_name in TABLE_NAMES:
-        template_file = f"sql/ddl/templates/raw/{table_name}.sql"
+    for i, table_name in enumerate(TABLE_NAMES):
+        template_path = TEMPLATE_PATHS[i]
         
-        with open(template_file, "r") as f_in:
+        with open(template_path, "r") as f_in:
             template_string = f_in.read()
         
         for suffix in TABLE_SUFFIXES:
@@ -66,7 +68,7 @@ def run() -> None:
             for line in query.split("\n"):
                 print(line)
             
-            print("Does this look right? Type y to proceed, any other key to skip.")
+            print("Does this look right? Enter y to proceed, or enter any other key to skip.")
             proceed = input()
 
             if proceed != 'y':

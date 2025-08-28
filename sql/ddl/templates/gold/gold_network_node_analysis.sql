@@ -1,0 +1,20 @@
+CREATE OR REPLACE TABLE `{project_id}.{dataset_name}.gold_network_node_analysis{suffix}` (
+  station_id STRING,
+  lat FLOAT64,
+  lon FLOAT64,
+  name STRING,
+  borough STRING,
+  capacity INT64,
+  in_degree INT64,
+  out_degree INT64,
+  total_degree INT64,
+  weighted_in_degree INT64,
+  weighted_out_degree INT64,
+  weighted_total_degree INT64,
+  is_critical BOOL,
+  is_bottleneck BOOL,
+  pagerank_score FLOAT64,
+  betweenness_centrality FLOAT64,
+  closeness_centrality FLOAT64,
+  degree_centrality FLOAT64
+);
