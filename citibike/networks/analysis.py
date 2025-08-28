@@ -73,16 +73,15 @@ class CommuterNetworkAnalyzer:
                       capacity=hub['capacity'])
         
         # Add edges between stations with min-capacity constraint
+        # Get capacities for edge constraint calculation
+        station_capacities = hubs_df.set_index('station_id')['capacity'].to_dict()
+
         for _, edge in edges_df.iterrows():
             start_station = edge['start_station_id'] 
             end_station = edge['end_station_id']
-            
-            # Get capacities for edge constraint calculation
-            station_capacities = hubs_df.set_index('station_id')['capacity'].to_dict()
             edge_capacity = min(station_capacities[start_station], station_capacities[end_station])
             
-            G.add_edge(f"{start_station}_out", f"{end_station}_in", 
-                      capacity=edge_capacity)
+            G.add_edge(f"{start_station}_out", f"{end_station}_in", capacity=edge_capacity)
         
         # Find sources and sinks
         # True sources: stations that only have outgoing edges
