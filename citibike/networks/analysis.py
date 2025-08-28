@@ -68,7 +68,7 @@ class CommuterNetworkAnalyzer:
         
         # Add node-split structure: each station becomes station_in -> station_out
         for _, hub in hubs_df.iterrows():
-            station_id = hub['station_id']  # Using 'name' as the station identifier
+            station_id = hub['station_id']
             G.add_edge(f"{station_id}_in", f"{station_id}_out", 
                       capacity=hub['capacity'])
         
