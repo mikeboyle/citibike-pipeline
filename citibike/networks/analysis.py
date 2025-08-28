@@ -44,7 +44,8 @@ class CommuterNetworkAnalyzer:
         for _, edge in edges_df.iterrows():
             edge_attrs = {
                 "distance_meters": edge["distance_meters"],
-                "num_trips": edge["num_trips"]
+                "num_trips": edge["num_trips"],
+                "avg_duration": edge["avg_duration"],
             }
             G.add_edge(edge["start_station_id"], edge["end_station_id"], **edge_attrs)
         
@@ -56,7 +57,7 @@ class CommuterNetworkAnalyzer:
         return {
             "pagerank": nx.pagerank(station_graph, weight="num_trips"),
             "betweenness_centrality": nx.betweenness_centrality(station_graph, weight="num_trips"),
-            "closeness_centrality": nx.closeness_centrality(station_graph, distance="distance_meters"),
+            "closeness_centrality": nx.closeness_centrality(station_graph, distance="avg_duration"),
             "degree_centrality": nx.degree_centrality(station_graph)
         }
 
@@ -242,4 +243,4 @@ if __name__ == "__main__":
     results_df = analyzer.run_analysis(hubs_df, edges_df)
     print(f"found {len(results_df)} critical or bottleneck nodes")
     print(results_df.dtypes)
-    print(results_df[['name', 'borough', 'is_critical', 'is_bottleneck', 'degree_centrality']].sort_values('degree_centrality', ascending=False).head(10))
+    print(results_df[['name', 'borough', 'is_critical', 'is_bottleneck', 'closeness_centrality']].sort_values('closeness_centrality', ascending=False).head(10))

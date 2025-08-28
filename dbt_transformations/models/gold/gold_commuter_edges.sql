@@ -44,7 +44,8 @@ SELECT
     s_end.lat AS end_lat,
     s_end.lon AS end_lon,
     e.num_trips,
-    ST_DISTANCE(ST_GEOGPOINT(s_start.lon, s_start.lat), ST_GEOGPOINT(s_end.lon, s_end.lat)) AS distance_meters
+    ST_DISTANCE(ST_GEOGPOINT(s_start.lon, s_start.lat), ST_GEOGPOINT(s_end.lon, s_end.lat)) AS distance_meters,
+    e.avg_duration
 FROM commuter_edges e
 LEFT JOIN
     {{ ref('silver_stations') }} s_start
