@@ -224,23 +224,3 @@ class CommuterNetworkAnalyzer:
             results_df, table_ref, job_config=job_config
         )
         job.result()  # Wait for completion
-
-
-if __name__ == "__main__":
-    from citibike.config import load_config
-
-    config = load_config("dev")
-
-    analyzer = CommuterNetworkAnalyzer(config)
-
-    print("Extracting network data from BQ")
-    hubs_df, edges_df = analyzer.extract_network_data()
-
-    print(f"Loaded {len(hubs_df)} stations and {len(edges_df)} edges")
-
-    print("Running network flow analysis")
-
-    results_df = analyzer.run_analysis(hubs_df, edges_df)
-    print(f"found {len(results_df)} critical or bottleneck nodes")
-    print(results_df.dtypes)
-    print(results_df[['name', 'borough', 'is_critical', 'is_bottleneck', 'closeness_centrality']].sort_values('closeness_centrality', ascending=False).head(10))
