@@ -3,7 +3,7 @@
     unique_key='ride_id',
     partition_by={
         'field': 'started_at',
-        'data_type': 'timestamp',
+        'data_type': 'datetime',
         'granularity': 'day'
     },
     cluster_by=['start_station_id', 'started_at']

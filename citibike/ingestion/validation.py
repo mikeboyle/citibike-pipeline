@@ -1,7 +1,8 @@
 import pandas as pd
 from pandas.api.extensions import ExtensionDtype
 from typing import Dict
-from datetime import timezone
+from datetime import datetime
+import zoneinfo
 
 
 def validate_and_cast_trip_schema(df: pd.DataFrame, schema: Dict[str, ExtensionDtype]) -> pd.DataFrame:
@@ -34,6 +35,7 @@ def validate_and_cast_trip_schema(df: pd.DataFrame, schema: Dict[str, ExtensionD
         try:
             if expected_type == "datetime64[ns]":
                 df_typed[column] = pd.to_datetime(df_typed[column])
+                df_typed[column] = df_typed[column].dt.strftime("%Y-%m-%d %H:%M:%S.%f")
             elif expected_type in ['int64', 'Int64', 'float64']:
                 # Force numeric conversion first, then to integer
                 df_typed[column] = pd.to_numeric(df_typed[column], errors="coerce").astype(expected_type)
@@ -56,7 +58,10 @@ def add_metadata_columns(df: pd.DataFrame, batch_key_value: str, batch_key_col: 
     df_with_metadata = df.copy()
 
     # Add ingestion timestamp (when our pipeline ingested this data)
-    df_with_metadata["_ingested_at"] = pd.Timestamp.now(tz=timezone.utc)
+    # Set this as NYC local time (with timezone info stripped, leaving wall clock time only)
+    df_with_metadata["_ingested_at"] = datetime.now(
+        tz=zoneinfo.ZoneInfo("America/New_York")
+    ).strftime("%Y-%m-%d %H:%M:%S")
 
     # Add batch key (the time in history of the actual data)
     df_with_metadata[batch_key_col] = batch_key_value

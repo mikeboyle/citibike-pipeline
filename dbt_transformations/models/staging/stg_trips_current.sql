@@ -7,7 +7,7 @@ SELECT
     -- Timing (calculate duration from timestamps)
     started_at,
     ended_at, 
-    TIMESTAMP_DIFF(ended_at, started_at, SECOND) as trip_duration_seconds,
+    DATETIME_DIFF(ended_at, started_at, SECOND) as trip_duration_seconds,
     
     -- Station information (already in correct format)
     start_station_id,
