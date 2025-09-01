@@ -1,15 +1,16 @@
 from citibike.database.bigquery import initialize_bigquery_client
 from citibike.database.staging import StagingTableLoader
+from citibike.utils.date_helpers import DATETIME_STR_FORMAT
 
 import requests
 import json
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any, Dict, List
 import pandas as pd
 
 def _extract_station_rows(res: requests.Response, batch_key_value: str) -> List[Dict[str, Any]]:
     res_json = res.json()
-    api_last_updated = datetime.fromtimestamp(res_json.get('last_updated'))
+    api_last_updated = datetime.fromtimestamp(res_json.get('last_updated')).strftime(DATETIME_STR_FORMAT)
     api_version = res_json.get('version')
     
     data = res_json.get('data', {})
@@ -24,7 +25,7 @@ def _extract_station_rows(res: requests.Response, batch_key_value: str) -> List[
             rows.append({
                 "station_id": str(station_id),
                 "station_data": json.dumps(station),
-                "api_last_updated": api_last_updated.strftime("%Y-%m-%d %H:%M:%S"),
+                "api_last_updated": api_last_updated,
                 "api_version": str(api_version),
                 "_ingested_at": batch_key_value,
             })
@@ -37,7 +38,7 @@ def ingest_station_data(config: Dict[str, Any], batch_date: datetime) -> None:
     res.raise_for_status()
 
     # Extract rows from response (one station = one row)
-    batch_key_value = batch_date.strftime("%Y-%m-%d %H:%M:%S")
+    batch_key_value = batch_date.strftime(DATETIME_STR_FORMAT)
     rows = _extract_station_rows(res, batch_key_value)
     print(f"found {len(rows)} stations")
 
