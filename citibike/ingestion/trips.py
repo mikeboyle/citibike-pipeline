@@ -72,8 +72,8 @@ def _process_csv_batch(csv_path: str, batch_key_val: str, loader: StagingTableLo
 
     # ========================================
     # TEMPORARY: Limit to first 1000 rows for testing
-    df_raw = df_raw.head(1000)
-    print(f"DEBUG: Limited to {len(df_raw)} rows for testing")
+    # df_raw = df_raw.head(1000)
+    # print(f"DEBUG: Limited to {len(df_raw)} rows for testing")
     # ========================================
 
     df_validated = validate_and_cast_trip_schema(df_raw, schema)
