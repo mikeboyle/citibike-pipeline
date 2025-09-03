@@ -34,20 +34,14 @@
 
 ## Debugging
 - Make sure 1000 rows limit for trips is set
-- Rerun +silver_trips with limit of 1000 to debug
+- Rerun trips pipeline with limit of 1000 to debug
     - 2015-06
     - 2025-04
-
-- If no errors, rerun the gold models to debug:
-    - station perf dashboard
-    - network analysis pipeline
-
-- Make sure the aggregates and other results make sense (given the limited data)
 
 ## Bootstrapping corrected data
 - Comment out the 1000 rows restriction
 - Drop / recreate same tables in dev
-- Rerun +silver_stations
+- Rerun trips pipeline
     - 2015-06
     - 2025-04
     - 2025-05
