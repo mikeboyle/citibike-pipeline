@@ -1,15 +1,16 @@
 from citibike.database.bigquery import initialize_bigquery_client
 from citibike.database.staging import StagingTableLoader
+from citibike.utils.date_helpers import DATETIME_STR_FORMAT
 
 import requests
 import json
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any, Dict, List
 import pandas as pd
 
-def _extract_station_rows(res: requests.Response, batch_key_value: str) -> List[Dict[str, Any]]:
+def _extract_station_rows(res: requests.Response, batch_key_value: pd.Timestamp) -> List[Dict[str, Any]]:
     res_json = res.json()
-    api_last_updated = datetime.fromtimestamp(res_json.get('last_updated'), tz=timezone.utc)
+    api_last_updated = pd.Timestamp.fromtimestamp(res_json.get('last_updated')).tz_localize(None)
     api_version = res_json.get('version')
     
     data = res_json.get('data', {})
@@ -24,7 +25,7 @@ def _extract_station_rows(res: requests.Response, batch_key_value: str) -> List[
             rows.append({
                 "station_id": str(station_id),
                 "station_data": json.dumps(station),
-                "api_last_updated": api_last_updated.isoformat(),
+                "api_last_updated": api_last_updated,
                 "api_version": str(api_version),
                 "_ingested_at": batch_key_value,
             })
@@ -37,7 +38,7 @@ def ingest_station_data(config: Dict[str, Any], batch_date: datetime) -> None:
     res.raise_for_status()
 
     # Extract rows from response (one station = one row)
-    batch_key_value = batch_date.isoformat()
+    batch_key_value = pd.Timestamp(batch_date).tz_localize(None)
     rows = _extract_station_rows(res, batch_key_value)
     print(f"found {len(rows)} stations")
 
@@ -47,9 +48,7 @@ def ingest_station_data(config: Dict[str, Any], batch_date: datetime) -> None:
     # Cast to match BigQuery schema
     df['station_id'] = df['station_id'].astype(str)
     df['station_data'] = df['station_data'].astype(str) 
-    df['api_last_updated'] = pd.to_datetime(df['api_last_updated'])
     df['api_version'] = df['api_version'].astype(str)
-    df['_ingested_at'] = pd.to_datetime(df['_ingested_at'])
 
     # Initialize BigQuery client 
     client = initialize_bigquery_client(config)
@@ -59,6 +58,6 @@ def ingest_station_data(config: Dict[str, Any], batch_date: datetime) -> None:
 
     # Insert the rows
     loader = StagingTableLoader(client, table_id, "_ingested_at")
-    loader.load_and_merge_df(df, batch_key_value)
+    loader.load_and_merge_df(df, batch_key_value.strftime(DATETIME_STR_FORMAT))
     
     print(f"Successfully inserted {len(rows)} station records")

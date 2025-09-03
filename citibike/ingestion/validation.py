@@ -1,7 +1,9 @@
 import pandas as pd
 from pandas.api.extensions import ExtensionDtype
 from typing import Dict
-from datetime import timezone
+
+from citibike.utils.date_helpers import DATETIME_STR_FORMAT, now_nyc_datetime
+
 
 
 def validate_and_cast_trip_schema(df: pd.DataFrame, schema: Dict[str, ExtensionDtype]) -> pd.DataFrame:
@@ -56,7 +58,8 @@ def add_metadata_columns(df: pd.DataFrame, batch_key_value: str, batch_key_col: 
     df_with_metadata = df.copy()
 
     # Add ingestion timestamp (when our pipeline ingested this data)
-    df_with_metadata["_ingested_at"] = pd.Timestamp.now(tz=timezone.utc)
+    # Set this as NYC local time (with timezone info stripped, leaving wall clock time only)
+    df_with_metadata["_ingested_at"] = pd.Timestamp.now(tz='America/New_York').tz_localize(None)
 
     # Add batch key (the time in history of the actual data)
     df_with_metadata[batch_key_col] = batch_key_value
