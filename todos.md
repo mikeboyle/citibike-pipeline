@@ -1,20 +1,40 @@
 # REFACTOR TODOs
 
 ## BigQuery preparation
-- Drop / recreate tables in dev
+- Drop / recreate tables in dev with script:
     - raw_trips_legacy
     - raw_trips_legacy_staging
     - raw_trips_current
     - raw_trips_current_staging
     - raw_stations
     - raw_stations_staging
-    - silver_stations
+    - DO NOT replace gold tables
+- Drop silver_trips in BigQuery
 
 - Rename or somehow back up the gold tables
+    ```sql
+    -- One-time setup
+    CREATE SCHEMA IF NOT EXISTS `your-project.gold_backup_20250903`;
+
+    -- Backup existing gold tables
+    CREATE OR REPLACE TABLE `citibike-pipeline.gold_backup_20250903.gold_station_performance_dashboard` 
+    AS SELECT * FROM `citibike-pipeline.citibike_dev.gold_station_performance_dashboard`;
+
+    CREATE OR REPLACE TABLE `citibike-pipeline.gold_backup_20250903.gold_commuter_edges` 
+    AS SELECT * FROM `citibike-pipeline.citibike_dev.gold_commuter_edges`;
+
+    CREATE OR REPLACE TABLE `citibike-pipeline.gold_backup_20250903.gold_commuter_hubs` 
+    AS SELECT * FROM `citibike-pipeline.citibike_dev.gold_commuter_hubs`;
+
+    -- Verify backups
+    SELECT 'original' as source, COUNT(*) as station_perf_count FROM `citibike-pipeline.citibike_dev.gold_station_performance_dashboard`
+    UNION ALL
+    SELECT 'backup' as source, COUNT(*) as station_perf_count FROM `citibike-pipeline.gold_backup_20250903.gold_station_performance_dashboard`;
+    ```
 
 ## Debugging
 - Make sure 1000 rows limit for trips is set
-- Rerun +silver_stations with limit of 1000 to debug
+- Rerun +silver_trips with limit of 1000 to debug
     - 2015-06
     - 2025-04
 
@@ -25,7 +45,7 @@
 - Make sure the aggregates and other results make sense (given the limited data)
 
 ## Bootstrapping corrected data
-- Remove the 100 rows restriction
+- Comment out the 1000 rows restriction
 - Drop / recreate same tables in dev
 - Rerun +silver_stations
     - 2015-06

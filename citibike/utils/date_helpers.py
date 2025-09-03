@@ -3,10 +3,11 @@ import zoneinfo
 
 DATETIME_STR_FORMAT = "%Y-%m-%d %H:%M:%S"
 
-def now_nyc_datetime_str() -> str:
+def now_nyc_datetime() -> datetime:
     """
-    Return the current datetime in America/New_York timezone
-    formatted as a BigQuery DATETIME string (YYYY-MM-DD HH:MM:SS).
+    Return the current datetime in America/New_York time
+    but with the timezone info removed (so it is a timezone naive datetime
+    which BigQuery may need to infer it is a datetime and not a utc timestamp).
     """
     ny_tz = zoneinfo.ZoneInfo("America/New_York")
-    return datetime.now(tz=ny_tz).strftime(DATETIME_STR_FORMAT)
+    return datetime.now(tz=ny_tz).replace(tzinfo=None)

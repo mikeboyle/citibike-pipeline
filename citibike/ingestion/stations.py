@@ -8,9 +8,9 @@ from datetime import datetime
 from typing import Any, Dict, List
 import pandas as pd
 
-def _extract_station_rows(res: requests.Response, batch_key_value: str) -> List[Dict[str, Any]]:
+def _extract_station_rows(res: requests.Response, batch_key_value: pd.Timestamp) -> List[Dict[str, Any]]:
     res_json = res.json()
-    api_last_updated = datetime.fromtimestamp(res_json.get('last_updated')).strftime(DATETIME_STR_FORMAT)
+    api_last_updated = pd.Timestamp.fromtimestamp(res_json.get('last_updated')).tz_localize(None)
     api_version = res_json.get('version')
     
     data = res_json.get('data', {})
@@ -38,7 +38,7 @@ def ingest_station_data(config: Dict[str, Any], batch_date: datetime) -> None:
     res.raise_for_status()
 
     # Extract rows from response (one station = one row)
-    batch_key_value = batch_date.strftime(DATETIME_STR_FORMAT)
+    batch_key_value = pd.Timestamp(batch_date).tz_localize(None)
     rows = _extract_station_rows(res, batch_key_value)
     print(f"found {len(rows)} stations")
 
@@ -58,6 +58,6 @@ def ingest_station_data(config: Dict[str, Any], batch_date: datetime) -> None:
 
     # Insert the rows
     loader = StagingTableLoader(client, table_id, "_ingested_at")
-    loader.load_and_merge_df(df, batch_key_value)
+    loader.load_and_merge_df(df, batch_key_value.strftime(DATETIME_STR_FORMAT))
     
     print(f"Successfully inserted {len(rows)} station records")

@@ -14,7 +14,7 @@ CREATE OR REPLACE TABLE `{project_id}.{dataset_name}.raw_trips_legacy{suffix}` (
   usertype STRING,                       -- Customer or Subscriber
   `birth year` INT64,                    -- Year of birth (nullable)
   gender INT64,                          -- 0=unknown, 1=male, 2=female (nullable)
-  _ingested_at DATETIME DEFAULT CURRENT_TIMESTAMP("America/New_York"),
+  _ingested_at DATETIME DEFAULT CURRENT_DATETIME("America/New_York"),
   _batch_key STRING                      -- YYYY-MM-batch_num
 )
 PARTITION BY DATE(_ingested_at)

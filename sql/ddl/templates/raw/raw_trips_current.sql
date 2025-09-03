@@ -12,7 +12,7 @@ CREATE OR REPLACE TABLE `{project_id}.{dataset_name}.raw_trips_current{suffix}` 
   end_lat FLOAT64,                       -- End latitude
   end_lng FLOAT64,                       -- End longitude
   member_casual STRING,                  -- member or casual
-  _ingested_at DATETIME DEFAULT CURRENT_TIMESTAMP("America/New_York"),
+  _ingested_at DATETIME DEFAULT CURRENT_DATETIME("America/New_York"),
   _batch_key STRING                      -- YYYY-MM-batch_num
 )
 PARTITION BY DATE(_ingested_at)
