@@ -58,6 +58,48 @@ trips_with_geography AS (
 
     LEFT JOIN {{ ref('silver_stations') }} end_station
         ON t.end_station_id = end_station.short_name
+),
+
+duplicate_ride_ids AS (
+    SELECT ride_id
+    FROM trips_with_geography
+    GROUP BY ride_id
+    HAVING COUNT(*) > 1
+),
+
+trips_with_data_quality_flags AS (
+    SELECT
+        t.*,
+        -- flag for temporal outliers
+        CASE WHEN
+            t.trip_duration_seconds < 60 OR
+            t.trip_duration_seconds > (60 * 60 * 24) OR
+            t.started_at > {{ now_nyc_datetime() }} OR
+            t.started_at < {{ citibike_inception_date() }} OR
+            ended_at < started_at
+        THEN TRUE ELSE FALSE END AS is_temporal_outlier,
+
+        -- flag for geographic issues (impossible lat/lng or null lat/lng)
+        (t.start_lat IS NULL OR
+        t.start_lng IS NULL OR
+        t.end_lat IS NULL OR
+        t.end_lng IS NULL OR
+        {{ is_geographic_outlier('t.start_lat', 't.start_lng') }} OR
+        {{ is_geographic_outlier('t.end_lat', 't.end_lng') }}) AS is_geography_quality_issue,
+
+        -- flag for data integrity issues
+        CASE WHEN
+            t.start_station_id IS NULL OR
+            t.end_station_id IS NULL OR
+            t.ride_id LIKE '%test%'
+        THEN TRUE ELSE FALSE END AS is_data_integrity_issue,
+
+        -- flag for potential duplicates
+        (d.ride_id IS NOT NULL) AS is_duplicate_ride
+
+    FROM trips_with_geography t
+    LEFT JOIN duplicate_ride_ids d
+    ON t.ride_id = d.ride_id
 )
 
-SELECT * FROM trips_with_geography
+SELECT * FROM trips_with_data_quality_flags

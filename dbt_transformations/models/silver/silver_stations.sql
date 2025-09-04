@@ -44,21 +44,44 @@ deduplicated_stations AS (
 max_ingestion_time AS (
     SELECT MAX(_ingested_at) as max_ingested_at
     FROM latest_stations
+),
+
+stations_with_boroughs AS (
+    SELECT
+        l.*,
+        COALESCE(
+            bb.borough_name,
+            (
+                CASE WHEN l.region_id IN ('70', '311') THEN 'NJ'
+                ELSE 'Unknown' END
+            )
+        ) AS borough,
+        l._ingested_at = (SELECT max_ingested_at FROM max_ingestion_time) AS is_active,
+    FROM
+        deduplicated_stations l
+    LEFT JOIN
+        {{ ref('silver_nyc_borough_boundaries') }} bb
+    ON
+        ST_WITHIN(ST_GEOGPOINT(l.lon, l.lat), bb.boundary_polygon)
+),
+
+stations_with_data_quality_flags AS (
+    SELECT
+        t.*,
+        -- flag for geographic issues (impossible lat/lng or null lat/lng)
+        (t.lat IS NULL OR
+        t.lon IS NULL OR
+        (t.borough = 'Unknown' AND t.region_id IS NULL) OR
+        {{ is_geographic_outlier('t.lat', 't.lon') }}) AS is_geography_quality_issue,
+
+        -- flag for data integrity issues
+        CASE WHEN
+            t.name IS NULL OR
+            t.station_id IS NULL OR
+            t.short_name IS NULL
+        THEN TRUE ELSE FALSE END AS is_data_integrity_issue,
+
+    FROM stations_with_boroughs t
 )
 
-SELECT
-    l.*,
-    COALESCE(
-        bb.borough_name,
-        (
-            CASE WHEN l.region_id IN ('70', '311') THEN 'NJ'
-            ELSE 'Unknown' END
-        )
-    ) AS borough,
-    l._ingested_at = (SELECT max_ingested_at FROM max_ingestion_time) AS is_active,
-FROM
-    deduplicated_stations l
-LEFT JOIN
-    {{ ref('silver_nyc_borough_boundaries') }} bb
-ON
-    ST_WITHIN(ST_GEOGPOINT(l.lon, l.lat), bb.boundary_polygon)
+SELECT * FROM stations_with_data_quality_flags
