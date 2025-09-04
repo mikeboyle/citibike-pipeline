@@ -71,6 +71,7 @@ stations_with_data_quality_flags AS (
         -- flag for geographic issues (impossible lat/lng or null lat/lng)
         (t.lat IS NULL OR
         t.lon IS NULL OR
+        (t.borough = 'Unknown' AND t.region_id IS NULL) OR
         {{ is_geographic_outlier('t.lat', 't.lon') }}) AS is_geography_quality_issue,
 
         -- flag for data integrity issues
