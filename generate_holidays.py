@@ -1,6 +1,6 @@
 """
 This script is here for documentation purposes only.
-It has already been run to generate dbt_transformations/seeds
+It has already been run to generate dbt_transformations/seeds/holidays.csv
 """
 import holidays
 import csv

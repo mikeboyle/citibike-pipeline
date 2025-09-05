@@ -108,5 +108,6 @@ A modern data stack implementation using Citibike trip and station data.
    - `cd` to `dbt_transformations` directory
    - run `dbt seed`
    - This should create and populate the `holidays` table in BigQuery
+   - Note: It is **not** necessary to run the `generate_holidays.py` script. This has already been done to generate the `holidays.csv` file used as a seed.
 
 
