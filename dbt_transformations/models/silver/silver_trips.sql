@@ -31,12 +31,7 @@ trips_enriched AS (
         EXTRACT(HOUR FROM started_at) as start_hour,
         EXTRACT(DAYOFWEEK FROM started_at) as start_day_of_week,
         EXTRACT(MONTH FROM started_at) as start_month,
-        CASE
-            WHEN EXTRACT(MONTH FROM started_at) IN (12,1,2) THEN 'Winter'
-            WHEN EXTRACT(MONTH FROM started_at) IN (3,4,5) THEN 'Spring'
-            WHEN EXTRACT(MONTH FROM started_at) IN (6,7,8) THEN 'Summer'
-            ELSE 'Fall'
-        END as start_season,
+        {{ derive_season('started_at') }} as start_season,
 
         -- Boolean flags
         EXTRACT(DAYOFWEEK FROM started_at) IN (1,7) as is_weekend,

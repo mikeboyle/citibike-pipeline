@@ -27,7 +27,13 @@ wheels/
 venv/
 .venv/
 
+# Data files (if any get downloaded locally)
+*.csv
+*.json.gz
+*.parquet
+
 # dbt
+!dbt_transformations/seeds/*.csv
 dbt_transformations/target/
 dbt_transformations/dbt_packages/
 dbt_transformations/logs/
@@ -51,10 +57,6 @@ airflow/logs/*
 Thumbs.db
 *.tmp
 
-# Data files (if any get downloaded locally)
-*.csv
-*.json.gz
-*.parquet
 
 # Testing
 .pytest_cache/
