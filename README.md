@@ -97,6 +97,17 @@ A modern data stack implementation using Citibike trip and station data.
    - `dbt debug` # tests dev environment
    - `dbt debug --target prod` # tests prod environment
 
-### 5. Next Steps
-TODO: Add instructions for ingestion scripts, dbt models, and Airflow setup as they are built.
+### 5. Add seed data
+1. **Borough boundaries**
+   - `cd` to the `airflow/dags` directory
+   - run `python boundaries_pipeline.py`
+   - This should populate the `raw_nyc_borough_boundaries` table in BigQuery
+   - This should also create and populate the `silver_nyc_borough_boundaries` table in BigQuery
+
+2. **NYC holidays**
+   - `cd` to `dbt_transformations` directory
+   - run `dbt seed`
+   - This should create and populate the `holidays` table in BigQuery
+   - Note: It is **not** necessary to run the `generate_holidays.py` script. This has already been done to generate the `holidays.csv` file used as a seed.
+
 
