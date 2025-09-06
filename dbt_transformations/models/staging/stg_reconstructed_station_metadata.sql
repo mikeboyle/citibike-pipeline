@@ -1,18 +1,34 @@
+-- Finds all station ids found in the trips table
+-- which cannot be matched to the GBFS stations data
+-- in the silver_stations table
+
 {{ config(
     materialized='view'
 ) }}
 
--- Identify stations that fell back to legacy IDs (missing from GBFS)
-WITH missing_station_ids AS (
+-- All station_ids found in silver_trips
+WITH all_trip_station_ids AS (
     (SELECT start_station_id AS station_id
     FROM {{ ref('silver_trips') }}
-    WHERE start_station_id = legacy_start_station_id)
+    WHERE start_station_id IS NOT NULL AND start_station_id != '')
 
     UNION DISTINCT
     
     (SELECT end_station_id AS station_id
     FROM {{ ref('silver_trips') }}
-    WHERE end_station_id = legacy_end_station_id)
+    WHERE end_station_id IS NOT NULL AND end_station_id != '')
+),
+
+-- Identify stations that are not in our stations table
+-- This will include station_ids that are fallbacks to a legacy id
+-- (and therefore won't match any short_name values in silver_stations)
+-- as well as non-legacy station_ids that can't be joined to a silver_station
+missing_station_ids AS (
+    SELECT t.station_id
+    FROM all_trip_station_ids t
+    LEFT JOIN {{ ref('silver_stations') }} s
+    ON t.station_id = s.short_name
+    WHERE s.short_name IS NULL
 ),
 
 -- Reconstruct metadata for missing stations, except borough
