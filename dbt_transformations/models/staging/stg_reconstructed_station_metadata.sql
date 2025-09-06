@@ -36,7 +36,10 @@ reconstructed_stations_without_boroughs AS (
     SELECT 
         m.station_id,
         ANY_VALUE(CASE WHEN t.start_station_id = m.station_id THEN t.start_station_name END) AS station_name,
-        CAST(NULL AS STRING) AS short_name,
+        CASE
+            WHEN m.station_id LIKE '%.%' THEN m.station_id -- Current format (e.g. '6865.03')
+            ELSE CAST(NULL AS STRING) -- Legacy format (e.g., '102', a uuid)
+        END AS short_name,
         AVG(CASE WHEN t.start_station_id = m.station_id AND NOT t.is_geography_quality_issue 
                 THEN t.start_lat END) AS lat,
         AVG(CASE WHEN t.start_station_id = m.station_id AND NOT t.is_geography_quality_issue 
