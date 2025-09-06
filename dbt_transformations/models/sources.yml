@@ -35,7 +35,7 @@ sources:
           - name: api_last_updated
             description: "Timestamp of last update to stations"
           - name: api_version
-            desccription: "GBFS api version"
+            description: "GBFS api version"
           - name: _ingested_at
             description: "When the GBFS data was accessed"
       - name: raw_nyc_borough_boundaries
