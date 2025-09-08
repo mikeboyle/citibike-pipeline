@@ -29,36 +29,10 @@ This pipeline processes historical and real-time Citibike data to create:
 ## Setup
 
 ### Prerequisites
-
 - Python 3.8+
 - Google Cloud Platform account
 
-### 1. Local Environment Setup
-
-1. **Create Virtual Environment**
-   1. Clone this repo
-   2. `cd` into the root director `citibike-pipeline`
-   3. Create and activate a virtual environment
-   ```bash
-   
-   python3 -m venv .venv
-   source .venv/bin/activate
-   ```
-
-2. **Install Dependencies**
-   ```bash
-   cd root/dir/of/reop
-   pip install --upgrade pip
-   pip install -r requirements.txt
-   pip install -e . # Install project package
-   ```
-
-3. **Configure Environment-Dependent Parameters**
-   - Copy `config/dev.env.example` to `config/dev.env`
-   - Copy `config/prod.env.example` `config/prod.env`
-   - Update `GCP_PROJECT_ID` in both files with your actual project ID
-
-### 2. GCP Setup
+### 1. GCP Account and Project Setup
 
 1. **Create GCP Project**
    - Go to [Google Cloud Console](https://console.cloud.google.com)
@@ -81,44 +55,52 @@ This pipeline processes historical and real-time Citibike data to create:
    - Assign roles: `BigQuery Data Editor`, `BigQuery Job User`
    - Generate and download JSON key
 
-5. **Save Credentials**
+### 2. Local Environment Setup
+
+1. **Create Virtual Environment**
+   1. Clone this repo
+   2. `cd` into the root directory `citibike-pipeline`
+   3. Create and activate a virtual environment
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate
+   ```
+
+2. **Install Dependencies**
+   ```bash
+   pip install --upgrade pip
+   pip install -r requirements.txt
+   pip install -e . # Install project package
+   ```
+
+3. **Configure Environment Files**
+   - Copy `config/dev.env.example` to `config/dev.env`
+   - Copy `config/prod.env.example` to `config/prod.env`
+   - Update `GCP_PROJECT_ID` in both files with your actual project ID
    - Save the JSON key as `config/service-account.json`
    - Update `GOOGLE_APPLICATION_CREDENTIALS` in `config/*.env` to the **absolute** path to your `service-account.json` credentials
 
+### 3. Data Setup
 
-### 3. Create BigQuery tables
-
-1. **Create Raw Tables**
+1. **Create BigQuery Tables**
    - Navigate to the project root
    - Run `python create_tables.py dev` to create tables in `dev` environment
    - Run `python create_tables.py prod` to create tables in `prod` environment
-   - This creates the raw layer tables for data ingestion 
+   - This creates the raw layer tables for data ingestion
+   - Go to the BigQuery console and confirm that the expected tables were created
 
-2. **Manually verify**
-   Go to the BigQuery console and confirm that the expected tables were created with the columns and datatypes you expect.
+2. **Configure DBT**
+   - Run `python generate_dbt_profile.py` to create `dbt_transformations/profiles.yml`
+   - Test connections:
+     ```bash
+     cd dbt_transformations
+     dbt debug # tests dev environment
+     dbt debug --target prod # tests prod environment
+     ```
 
-### 4. Configure DBT
-1. **Configure profile**
-   - **In the project root**, run `generate_dbt_profile.py`
-   - This should create the file `dbt_transformations/profiles.yml`
-
-2. **Test dbt connection to BigQuery**
-   - `cd dbt_transformations`
-   - `dbt debug` # tests dev environment
-   - `dbt debug --target prod` # tests prod environment
-
-### 5. Add seed data
-1. **Borough boundaries**
-   - `cd` to the `airflow/dags` directory
-   - run `python boundaries_pipeline.py`
-   - This should populate the `raw_nyc_borough_boundaries` table in BigQuery
-   - This should also create and populate the `silver_nyc_borough_boundaries` table in BigQuery
-
-2. **NYC holidays**
-   - `cd` to `dbt_transformations` directory
-   - run `dbt seed`
-   - This should create and populate the `holidays` table in BigQuery
-   - Note: It is **not** necessary to run the `generate_holidays.py` script. This has already been done to generate the `holidays.csv` file used as a seed.
+3. **Load Seed Data**
+   - NYC holidays: `cd dbt_transformations && dbt seed`
+   - Borough boundaries: `cd airflow/dags && python boundaries_pipeline.py`
 
 ## Running the pipelines
 
