@@ -1,22 +1,30 @@
 # Citibike Data Pipeline
 
-A modern data stack implementation using Citibike trip and station data.
+A comprehensive data pipeline that ingests, transforms, and analyzes NYC Citibike trip and station data to provide insights into bike sharing patterns, commuter behavior, and network performance.
+
+## What This Pipeline Does
+
+This pipeline processes historical and real-time Citibike data to create:
+- **Trip Analytics**: Detailed trip patterns, duration analysis, and usage trends
+- **Station Performance**: Station popularity, capacity utilization, and geographic insights
+- **Network Analysis**: Commuter flow patterns and critical / bottleneck hub identification
+- **Dimensional Models**: Time-based and station-based dimensions for analysis
 
 ## Architecture
 
-- **Orchestration**: Apache Airflow (Docker)
-- **Transformations**: dbt
-- **Data Warehouse**: Google BigQuery
-- **Visualization**: Omni Analytics
-- **Ingestion**: Custom Python scripts
+- **Data Warehouse**: Google BigQuery (bronze/silver/gold medallion architecture)
+- **Transformations**: dbt (staging → silver → gold layers)
+- **Orchestration**: Apache Airflow DAGs
+- **Ingestion**: Custom Python modules for trips, stations, and boundary data
+- **Package Structure**: Modular Python package with separate modules for ingestion, database operations, and utilities
 
 ## Project Structure
 
-- `airflow/` - Orchestration DAGs and plugins
-- `dbt/` - Data transformation models
-- `ingestion/` - Python scripts for data loading
-- `config/` - Environment configuration
-- `sql/` - Templates for creating initial tables in BigQuery
+- `citibike/` - Core Python package with ingestion, database, and utility modules
+- `dbt_transformations/` - dbt models organized in staging/silver/gold layers
+- `airflow/` - Orchestration DAGs and custom operators
+- `config/` - Environment configuration files
+- Root scripts - Setup utilities for tables, profiles, and holidays
 
 ## Setup
 
