@@ -11,8 +11,14 @@ class TripDataDownloader:
     def __init__(self, storage: StorageLocation, base_url: str):
         self.storage = storage
         self.base_url = base_url
+        self.csv_files_created = []  # Track CSV files for data ingestion and eventual cleanup
+        self.zip_files_created = []  # Track zip files for cleanup
 
-    def download_month(self, year: int, month: int) -> List[str]:
+    def download_month(self, year: int, month: int) -> None:
+        # Clear previous state
+        self.csv_files_created.clear()
+        self.zip_files_created.clear()
+
         # Construct YYYYMM prefix of file we want
         year_month_prefix = f"{year:04d}{month:02d}"
 
@@ -20,14 +26,13 @@ class TripDataDownloader:
         filename = f"{year_month_prefix}-citibike-tripdata.zip" if year >= 2024 else f"{year:04d}-citibike-tripdata.zip"
         url = f"{self.base_url}/{filename}"
 
-        # Download, extract, return CSV paths
+        # Download and extract files
         zip_path = self.storage.get_temp_path(filename)
         self._download_file(url, zip_path)
+        self.zip_files_created.append(zip_path)  # Track for cleanup
 
         # Extract desired CSV files only
-        csv_paths = self._extract_csv_files(zip_path, year_month_prefix)
-
-        return csv_paths
+        self._extract_csv_files(zip_path, year_month_prefix)
     
     def _download_file(self, url: str, dest_path: str) -> None:
         response = requests.get(url, stream=True)
@@ -37,9 +42,8 @@ class TripDataDownloader:
             for chunk in response.iter_content(chunk_size=65536):
                 f.write(chunk)
     
-    def _extract_csv_files(self, zip_path: str, year_month_prefix: str) -> List[str]:
+    def _extract_csv_files(self, zip_path: str, year_month_prefix: str) -> None:
         print(f"extracting from {zip_path}")
-        csv_paths = []
         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
             for file_info in zip_ref.infolist():
                 filename = file_info.filename
@@ -54,9 +58,11 @@ class TripDataDownloader:
                     with zip_ref.open(file_info) as source, open(extracted_path, 'wb') as target:
                         target.write(source.read())
                     
+                    self.zip_files_created.append(extracted_path)  # Track nested zip for cleanup
                     next_zip_path = self.storage.get_temp_path(basename)
                     print(f"recursively extract from {next_zip_path}")
-                    return self._extract_csv_files(next_zip_path, year_month_prefix)
+                    self._extract_csv_files(next_zip_path, year_month_prefix)
+                    return
                 
                 # Case 2: We have found a CSV file to extract
                 elif basename.startswith(year_month_prefix) and extension == ".csv":                    
@@ -72,6 +78,8 @@ class TripDataDownloader:
                         with zip_ref.open(file_info) as source, open(extracted_path, 'wb') as target:
                             target.write(source.read())
                         
-                        csv_paths.append(extracted_path)
-        
-        return csv_paths
+                        self.csv_files_created.append(extracted_path)
+
+    def get_all_files_for_cleanup(self) -> List[str]:
+        """Return all files (CSV and ZIP) created during download/extraction for cleanup."""
+        return self.csv_files_created + self.zip_files_created
