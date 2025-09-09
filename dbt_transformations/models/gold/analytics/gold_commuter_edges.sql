@@ -28,6 +28,8 @@ commuter_edges AS (
         AND start_hour <= 10
         AND NOT is_weekend
         AND NOT is_temporal_outlier
+        AND NOT is_data_integrity_issue
+        AND NOT is_geography_quality_issue
     GROUP BY start_station_id, end_station_id
 ),
 
