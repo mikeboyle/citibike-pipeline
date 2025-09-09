@@ -45,7 +45,7 @@ First, we take recent trip data (from the most recent 90 days of data) and filte
 This view of the data reveals a commuter network that is a subset of the overall Citibike network. It has many interesting characteristics:
 
 - A relatively small number of stations (~800 out of 2,200+ total stations) and one-way routes (~1,600 out of millions of possible combinations, with a route from A to B considered different from a route from B to A)
-- Large hubs centered around subway stations (like Bedford L or Penn Station), bike infrastructure (most notably the Hudson River Greenway), and to a lesser extent bridges
+- Large hubs centered around subway and train stations (like Bedford L or Penn Station), bike infrastructure (most notably the Hudson River Greenway), and to a lesser extent bridges
 - Many stations (about 500) that have literally zero trips starting from them (purely destinations) or have literally zero trips ending at them (purely start points). An example of a "pure start point" station in the data is 3rd Street and Avenue D. An example of a "pure end point" station is Astor Place.
 - Some massive "bidirectional" hubs (like Penn Station) that receive large flows of trips as a destination and a starting point
 
@@ -55,9 +55,11 @@ Here is a visualization of the routes in the morning commute network for the per
 
 ## The commuter network is a flow network
 
-Many of these characteristics are found in **flow networks**. A flow network is a directed graph with a single source node (a node with no incoming edges), a single sink node (a node with no outgoing edges), and defined capacities for each edge. Flow networks are used to model real-world problems like Internet congestion, where the nodes are routers and the edge capacities are bandwidth limits of the physical links between routers. Oil or water pipelines are another example, where the size of the pipe constrains the flow from one junction to the next. A third example would be airline flight networks, where the number of available flights per day between different airports constrains the maximum number of people who can fly from, let's say, New York to Los Angeles on a given day. These characteristics naturally emerge in the commuter network. After all, an important use of Citibike is to help lots of people get from their homes to where they work, either by biking directly to their office or by biking to a subway to take to their office. This is a network with clear sources (start points) and sinks (destination points).
+Many of these characteristics are found in **flow networks**. A flow network is a directed graph with a single source node (a node with no incoming edges), a single sink node (a node with no outgoing edges), and defined capacities for each edge. Flow networks are used to model real-world problems like Internet congestion, where the nodes are routers and the edge capacities are bandwidth limits of the physical links between routers. Oil or water pipelines are another example, where the size of the pipe constrains the flow from one junction to the next. A third example would be airline flight networks, where the number of available flights per day between different airports constrains the maximum number of people who can fly from, let's say, New York to Los Angeles on a given day. Here's how you'll see a flow network illustrated in a typical algorithms textbook:
 
 ![Diagram of a simple flow network, with the max flow path highlighted](./flow_network_example.jpg)
+
+These flow network characteristics naturally emerge in the commuter network. After all, an important use of Citibike is to help lots of people get from their homes to where they work, either by biking directly to their office, biking to a train to take to their office, or taking a train into the city and then Citibiking to work. This is a network with clear sources (start points), sinks (destination points), and giant hubs.
 
 Using the station and trips data, we can model Citibike commuting as a flow network, and more specifically as a max flow problem that identifies the maximum possible throughput of bikes to destinations, given the capacities of stations in the network. We can then identify critical stations (stations where a decrease in capacity decreases the max flow) and bottleneck stations (stations where an increase in capacity would increase the max flow). Many stations are both critical and bottleneck stations, but they can also be only one, or neither.
 
@@ -98,11 +100,11 @@ This visualization shows the critical stations (in orange) and stations which ar
 
 ## Implementation
 
-The standard pipeline architecture centered around dbt needs to be adapted for this type of analysis pipeline. Dbt is primarily a tool that constructs SQL queries which then need to be run on your data warehouse's compute layer. A data warehouse like BigQuery (used in this project) does have an additional feature, called `BigFrames`, which can work with dbt to allow a limited set of compute operations to be done on pandas-like data frames instead of traditional tables. However, most operations like model training and inference or, in this case, network analysis, will still not be suitable.
+The standard pipeline architecture centered around dbt needs to be adapted for this type of analysis pipeline. Dbt is primarily a tool that constructs SQL queries which then need to be run on your data warehouse's compute layer. The specialized graph algorithms required for this network analysis (maximum flow, centrality calculations, residual graph analysis) would be very difficult to translate into SQL operations, if not impossible. For a data warehouse like BigQuery (used in this project), dbt also supports a feature called `BigFrames`, which provides pandas-like DataFrame operations and machine learning capabilities for tasks like model training and inference. However, the BigFrames API does not directly support the networkx package specifically or these types of pure Python operations in general.
 
-For this reason, the pipeline uses the BigQuery client to read the source tables into the memory of a separate Python process. This process does the network analysis, creates a pandas DataFrame to hold the results, and then writes the results to a BigQuery table.
+For this reason, the pipeline uses a separate Python process for the network analysis which is not managed by dbt. The process first uses the BigQuery client to read the source tables into memory. Then we perform the network analysis and put the results into a pandas DataFrame. Finally, we write this DataFrame to a BigQuery table.
 
-When working with data at a much larger scale, this type of job would need to be offloaded to a cluster of containers, or to another compute tool such as PySpark that can parallelize these operations and handle compute on data that cannot fit into a single machine's working memory.
+When working with data at a much larger scale (millions of edges and/or stations), this type of job would need to be offloaded to a cluster of containers, or to another compute tool such as PySpark that can parallelize these operations and handle compute on data that cannot fit into a single machine's working memory.
 
 ## Conclusion and next steps
 
