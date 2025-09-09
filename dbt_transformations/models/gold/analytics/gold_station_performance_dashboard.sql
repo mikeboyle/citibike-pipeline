@@ -128,7 +128,7 @@ SELECT
     -- Imbalance metrics
     CASE 
         WHEN COALESCE(aa.total_activity, 0) > 0 
-        THEN ROUND(COALESCE(aa.net_inflow, 0) / aa.total_activity * 100, 1)
+        THEN ROUND(COALESCE(aa.net_inflow, 0) / aa.total_activity, 1)
         ELSE NULL 
     END AS imbalance_ratio,  -- Positive = station gaining bikes
     
@@ -157,7 +157,7 @@ FROM
 LEFT JOIN 
     aggregated_activity aa
 ON
-    ds.station_id = aa.station_id
+    ds.short_name = aa.station_id
 LEFT JOIN 
     station_rush_hour_metrics srh
 ON
