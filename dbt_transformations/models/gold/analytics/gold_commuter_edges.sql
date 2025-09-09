@@ -23,11 +23,11 @@ commuter_edges AS (
         AVG(trip_duration_seconds) AS avg_duration
     FROM {{ ref('silver_trips') }}
     WHERE DATE(started_at) >= (SELECT start_date from date_range)
-        AND start_station_id <> end_station_id -- no self loops
+        AND NOT is_round_trip -- no self loops
         AND start_hour >= 7
         AND start_hour <= 10
         AND NOT is_weekend
-        AND trip_duration_seconds > 60
+        AND NOT is_temporal_outlier
     GROUP BY start_station_id, end_station_id
 ),
 
