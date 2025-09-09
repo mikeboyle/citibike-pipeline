@@ -28,16 +28,16 @@ def _ingest_trip_data(config: Dict[str, Any], year: int, month: int, table_name:
 
     # Download and extract CSV files
     downloader = TripDataDownloader(storage, config["TRIP_DATA_URL"])
-    csv_paths = downloader.download_month(year, month)
-    print(f"Downloaded CSV files to paths {csv_paths}")
+    downloader.download_month(year, month)
+    print(f"Downloaded CSV files to paths {sorted(downloader.csv_files_created)}")
 
     # Process each CSV file as a separate batch
-    for csv_path in csv_paths:
+    for csv_path in sorted(downloader.csv_files_created):
         batch_key = _extract_batch_key_from_filename(csv_path)
         _process_csv_batch(csv_path, batch_key, loader, schema)
 
-    # Clean up downloaded files
-    storage.cleanup(csv_paths)
+    # Clean up downloaded files (both CSV and ZIP files)
+    storage.cleanup(downloader.get_all_files_for_cleanup())
 
     print(f"Successfully ingested trip data for {year}-{month:02d}")
 
