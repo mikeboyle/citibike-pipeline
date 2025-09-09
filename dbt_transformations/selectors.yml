@@ -1,0 +1,15 @@
+selectors:
+  - name: dashboard_models
+    description: "Core dashboard models excluding commuter network analysis"
+    definition:
+      union:
+        - method: path
+          value: models/staging
+        - method: path  
+          value: models/silver
+        - method: path
+          value: models/gold/facts
+        - method: path
+          value: models/gold/dimensions
+        - method: fqn
+          value: gold_station_performance_dashboard
