@@ -37,9 +37,9 @@ def run():
     print(f"Stage 2: Ingest trip data for {month_key}")
     ingest_trip_data(config, year, month)
 
-    print(f"Stage 3: Transform raw stations/trips to silver stations/trips")
+    print(f"Stage 3: Transform data through gold dashboard models")
     dbt_vars = json.dumps({ "month_key": month_key })
-    dbt_command = ["dbt", "run", "--select", "+silver_trips", "--vars", dbt_vars]
+    dbt_command = ["dbt", "run", "--selector", "dashboard_models", "--vars", dbt_vars]
     run_dbt_command(dbt_command)
 
 
