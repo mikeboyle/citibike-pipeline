@@ -100,11 +100,11 @@ This visualization shows the critical stations (in orange) and stations which ar
 
 ## Implementation
 
-The standard pipeline architecture centered around dbt needs to be adapted for this type of analysis pipeline. Dbt is primarily a tool that constructs SQL queries which then need to be run on your data warehouse's compute layer. A data warehouse like BigQuery (used in this project) does have an additional feature, called `BigFrames`, which can work with dbt to allow a limited set of compute operations to be done on pandas-like data frames instead of traditional tables. However, most operations like model training and inference or, in this case, network analysis, will still not be suitable.
+The standard pipeline architecture centered around dbt needs to be adapted for this type of analysis pipeline. Dbt is primarily a tool that constructs SQL queries which then need to be run on your data warehouse's compute layer. The specialized graph algorithms required for this network analysis (maximum flow, centrality calculations, residual graph analysis) would be very difficult to translate into SQL operations, if not impossible. For a data warehouse like BigQuery (used in this project), dbt also supports a feature called `BigFrames`, which provides pandas-like DataFrame operations and machine learning capabilities for tasks like model training and inference. However, the BigFrames API does not directly support the networkx package specifically or these types of pure Python operations in general.
 
-For this reason, the pipeline uses the BigQuery client to read the source tables into the memory of a separate Python process. This process does the network analysis, creates a pandas DataFrame to hold the results, and then writes the results to a BigQuery table.
+For this reason, the pipeline uses a separate Python process for the network analysis which is not managed by dbt. The process first uses the BigQuery client to read the source tables into memory. Then we perform the network analysis and put the results into a pandas DataFrame. Finally, we write this DataFrame to a BigQuery table.
 
-When working with data at a much larger scale, this type of job would need to be offloaded to a cluster of containers, or to another compute tool such as PySpark that can parallelize these operations and handle compute on data that cannot fit into a single machine's working memory.
+When working with data at a much larger scale (millions of edges and/or stations), this type of job would need to be offloaded to a cluster of containers, or to another compute tool such as PySpark that can parallelize these operations and handle compute on data that cannot fit into a single machine's working memory.
 
 ## Conclusion and next steps
 
