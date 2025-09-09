@@ -70,11 +70,23 @@ daily_rush_hour_patterns AS (
         rt.date_key,
         dd.day_of_week,
         -- Morning rush daily min/max per station
-        MIN(CASE WHEN rt.start_hour BETWEEN 7 AND 10 THEN rt.start_station_running_bike_balance END) AS daily_morning_min,
-        MAX(CASE WHEN rt.start_hour BETWEEN 7 AND 10 THEN rt.start_station_running_bike_balance END) AS daily_morning_max,
+        COALESCE(
+            MIN(CASE WHEN rt.start_hour BETWEEN 7 AND 10 THEN rt.start_station_running_bike_balance END),
+            0
+         ) AS daily_morning_min,
+        COALESCE(
+            MAX(CASE WHEN rt.start_hour BETWEEN 7 AND 10 THEN rt.start_station_running_bike_balance END),
+            0
+        ) AS daily_morning_max,
         -- Evening rush daily min/max per station  
-        MIN(CASE WHEN rt.start_hour BETWEEN 17 AND 20 THEN rt.start_station_running_bike_balance END) AS daily_evening_min,
-        MAX(CASE WHEN rt.start_hour BETWEEN 17 AND 20 THEN rt.start_station_running_bike_balance END) AS daily_evening_max
+        COALESCE(
+            MIN(CASE WHEN rt.start_hour BETWEEN 17 AND 20 THEN rt.start_station_running_bike_balance END),
+            0
+        ) AS daily_evening_min,
+        COALESCE(
+            MAX(CASE WHEN rt.start_hour BETWEEN 17 AND 20 THEN rt.start_station_running_bike_balance END),
+            0
+        ) AS daily_evening_max
     FROM recent_trips rt
     JOIN {{ ref('gold_dim_dates') }} dd 
     ON rt.date_key = dd.date_key
@@ -128,7 +140,7 @@ SELECT
     -- Imbalance metrics
     CASE 
         WHEN COALESCE(aa.total_activity, 0) > 0 
-        THEN ROUND(COALESCE(aa.net_inflow, 0) / aa.total_activity, 1)
+        THEN ROUND(COALESCE(aa.net_inflow, 0) / aa.total_activity, 2)
         ELSE NULL 
     END AS imbalance_ratio,  -- Positive = station gaining bikes
     
@@ -142,19 +154,19 @@ SELECT
 
     CASE
         WHEN COALESCE(ds.capacity, 0) > 0
-        THEN ROUND((avg_morning_daily_swing / capacity), 2)
+        THEN ROUND((srh.avg_morning_daily_swing / capacity), 2)
         ELSE NULL
     END AS balance_swing_ratio_morning,
 
     CASE
         WHEN COALESCE(ds.capacity, 0) > 0
-        THEN ROUND((avg_evening_daily_swing / capacity), 2)
+        THEN ROUND((srh.avg_evening_daily_swing / capacity), 2)
         ELSE NULL
     END AS balance_swing_ratio_evening,
 
 FROM 
     {{ ref('gold_dim_stations') }} ds
-LEFT JOIN 
+INNER JOIN 
     aggregated_activity aa
 ON
     ds.short_name = aa.station_id
