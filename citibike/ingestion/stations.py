@@ -1,3 +1,4 @@
+import os
 from citibike.database.bigquery import initialize_bigquery_client
 from citibike.database.staging import StagingTableLoader
 from citibike.utils.date_helpers import DATETIME_STR_FORMAT
@@ -31,9 +32,9 @@ def _extract_station_rows(res: requests.Response, batch_key_value: pd.Timestamp)
             })
     return rows
 
-def ingest_station_data(config: Dict[str, Any], batch_date: datetime) -> None:
+def ingest_station_data(batch_date: datetime) -> None:
     # Fetch latest station data
-    station_url = config['GBFS_STATION_URL']
+    station_url = os.environ['GBFS_STATION_URL']
     res = requests.get(station_url)
     res.raise_for_status()
 
@@ -51,10 +52,10 @@ def ingest_station_data(config: Dict[str, Any], batch_date: datetime) -> None:
     df['api_version'] = df['api_version'].astype(str)
 
     # Initialize BigQuery client 
-    client = initialize_bigquery_client(config)
+    client = initialize_bigquery_client(validate_connection=True)
 
     # Build table reference
-    table_id = f"{config['GCP_PROJECT_ID']}.{config['BQ_DATASET']}.raw_stations"
+    table_id = f"{os.environ['GCP_PROJECT_ID']}.{os.environ['BQ_DATASET']}.raw_stations"
 
     # Insert the rows
     loader = StagingTableLoader(client, table_id, "_ingested_at")

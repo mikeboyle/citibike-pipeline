@@ -10,24 +10,24 @@ from citibike.database.staging import StagingTableLoader
 from citibike.database.bigquery import initialize_bigquery_client
 
 
-def ingest_trip_data(config: Dict[str, Any], year: int, month: int):
+def ingest_trip_data(year: int, month: int):
     """Main function to be called by orchestrators"""
     # Choose which schema based on year parameters
     if year < 2020:
-        _ingest_legacy_trip_data(config, year, month)
+        _ingest_legacy_trip_data(year, month)
     else:
-        _ingest_current_trip_data(config, year, month)
+        _ingest_current_trip_data(year, month)
 
-def _ingest_trip_data(config: Dict[str, Any], year: int, month: int, table_name: str, schema: Dict[str, Any]):
+def _ingest_trip_data(year: int, month: int, table_name: str, schema: Dict[str, Any]):
     """Download and ingest trip data for the given month, table, and schema."""
     # Initialize components
     storage = LocalStorage()
-    client = initialize_bigquery_client(config)
-    table_id = f"{config['GCP_PROJECT_ID']}.{config['BQ_DATASET']}.{table_name}"
+    client = initialize_bigquery_client(validate_connection=True)
+    table_id = f"{os.environ['GCP_PROJECT_ID']}.{os.environ['BQ_DATASET']}.{table_name}"
     loader = StagingTableLoader(client, table_id, "_batch_key")
 
     # Download and extract CSV files
-    downloader = TripDataDownloader(storage, config["TRIP_DATA_URL"])
+    downloader = TripDataDownloader(storage, os.environ["TRIP_DATA_URL"])
     downloader.download_month(year, month)
     print(f"Downloaded CSV files to paths {sorted(downloader.csv_files_created)}")
 
@@ -42,14 +42,14 @@ def _ingest_trip_data(config: Dict[str, Any], year: int, month: int, table_name:
     print(f"Successfully ingested trip data for {year}-{month:02d}")
 
 
-def _ingest_legacy_trip_data(config: Dict[str, Any], year: int, month: int) -> None:
+def _ingest_legacy_trip_data(year: int, month: int) -> None:
     """Download and ingest trip data for the given month, expecting the legacy schema."""
-    _ingest_trip_data(config, year, month, "raw_trips_legacy", LEGACY_TRIP_CSV_SCHEMA)
+    _ingest_trip_data(year, month, "raw_trips_legacy", LEGACY_TRIP_CSV_SCHEMA)
 
 
-def _ingest_current_trip_data(config: Dict[str, Any], year: int, month: int) -> None:
+def _ingest_current_trip_data(year: int, month: int) -> None:
     """Download and ingest trip data for the given month, expecting the current schema."""
-    _ingest_trip_data(config, year, month, "raw_trips_current", CURRENT_TRIP_CSV_SCHEMA)
+    _ingest_trip_data(year, month, "raw_trips_current", CURRENT_TRIP_CSV_SCHEMA)
 
 
 def _extract_batch_key_from_filename(csv_path: str) -> str:

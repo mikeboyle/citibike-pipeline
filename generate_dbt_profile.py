@@ -1,16 +1,30 @@
+import os
 import yaml
 import sys
 
-from citibike.config import load_config
+from citibike.config import get_config_value_dict
 
 def generate_profile():
     try:
-        dev_config = load_config('dev')
-        prod_config = load_config('prod')
+        dev_config = get_config_value_dict('dev')
+        prod_config = get_config_value_dict('prod')
     except Exception as e:
         print(f"Error loading config: {e}")
         print("Make sure both config/dev.env and config/prod.env exist")
         sys.exit(1)
+    
+        # Dry run mode - validate configuration and exit
+    if os.environ.get('CITIBIKE_DRY_RUN', '').lower() == 'true':
+        print("✅ DRY RUN: Configuration loaded successfully")
+        for env, config in [('dev', dev_config), ('prod', prod_config)]:
+            print(f"   env name: {env}")
+            print(f"   GCP_PROJECT_ID: {config.get('GCP_PROJECT_ID', 'NOT SET')}")
+            print(f"   BQ_DATASET: {config.get('BQ_DATASET', 'NOT SET')}")
+            print(f"   GOOGLE_APPLICATION_CREDENTIALS: {config.get('GOOGLE_APPLICATION_CREDENTIALS', 'NOT SET')}")
+            print(f"   GBFS_STATION_URL: {config.get('GBFS_STATION_URL', 'NOT SET')}")
+            print(f"   TRIP_DATA_URL: {config.get('TRIP_DATA_URL', 'NOT SET')}")
+            print("⏹️  Stopping here - no actual BigQuery operations performed")
+        return
     
     profile = {
         'dbt_transformations': {

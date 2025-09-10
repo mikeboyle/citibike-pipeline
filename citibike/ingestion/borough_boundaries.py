@@ -1,15 +1,15 @@
+import os
 from typing import Any, Dict
 import requests
 import json
 from datetime import datetime, timezone
 
-from citibike.config import load_config
 from citibike.database.bigquery import initialize_bigquery_client
 
-def ingest_borough_boundaries(config: Dict[str, Any]):
+def ingest_borough_boundaries():
     """Fetch NYC borough boundaries and load to BigQuery raw table"""
     
-    url = config['NYC_BOROUGH_BOUNDARY_URL']
+    url = os.environ['NYC_BOROUGH_BOUNDARY_URL']
     print(f"Fetching data from {url}...")
 
     response = requests.get(url)
@@ -33,8 +33,8 @@ def ingest_borough_boundaries(config: Dict[str, Any]):
     print(f"Prepared {len(rows)} borough boundaries for ingestion")
 
     # Insert to BigQuery
-    client = initialize_bigquery_client(config)
-    table_id = f"{config['GCP_PROJECT_ID']}.{config['BQ_DATASET']}.raw_nyc_borough_boundaries"
+    client = initialize_bigquery_client(validate_connection=True)
+    table_id = f"{os.environ['GCP_PROJECT_ID']}.{os.environ['BQ_DATASET']}.raw_nyc_borough_boundaries"
 
     errors = client.insert_rows_json(table_id, rows)
     if errors:
@@ -42,8 +42,4 @@ def ingest_borough_boundaries(config: Dict[str, Any]):
     else:
         print(f"Successfully inserted {len(rows)} rows to {table_id}")
 
-# TODO: Remove after development
-if __name__ == "__main__":
-    config = load_config("dev")
-    ingest_borough_boundaries(config)
 

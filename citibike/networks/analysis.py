@@ -1,3 +1,4 @@
+import os
 from google.cloud import bigquery
 from citibike.database.bigquery import initialize_bigquery_client
 import pandas as pd
@@ -5,10 +6,10 @@ import networkx as nx
 
 
 class CommuterNetworkAnalyzer:
-    def __init__(self, config):
-        self.client: bigquery.Client  = initialize_bigquery_client(config)
-        self.project_id = config.get('GCP_PROJECT_ID')
-        self.dataset = config.get('BQ_DATASET')
+    def __init__(self):
+        self.client: bigquery.Client  = initialize_bigquery_client(validate_connection=True)
+        self.project_id = os.environ['GCP_PROJECT_ID']
+        self.dataset = os.environ['BQ_DATASET']
         self.SUPER_SOURCE = "super_source"
         self.SUPER_SINK = "super_sink"
     
