@@ -3,7 +3,6 @@ import requests
 import json
 from datetime import datetime, timezone
 
-from citibike.config import load_config
 from citibike.database.bigquery import initialize_bigquery_client
 
 def ingest_borough_boundaries(config: Dict[str, Any]):
@@ -42,8 +41,4 @@ def ingest_borough_boundaries(config: Dict[str, Any]):
     else:
         print(f"Successfully inserted {len(rows)} rows to {table_id}")
 
-# TODO: Remove after development
-if __name__ == "__main__":
-    config = load_config("dev")
-    ingest_borough_boundaries(config)
 

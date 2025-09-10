@@ -1,4 +1,5 @@
-from citibike.config import load_config
+import os
+from dotenv import load_dotenv
 from citibike.database.bigquery import initialize_bigquery_client
 import sys
 from glob import glob
@@ -28,14 +29,32 @@ def run() -> None:
     else:
         env_name = sys.argv[1]
     
-    config = load_config(env_name)
-    dataset_name = config.get("BQ_DATASET")
-    project_id = config.get("GCP_PROJECT_ID")
-
-    client = initialize_bigquery_client(config)
+    # Load environment configuration
+    load_dotenv(f"config/{env_name}.env")
+    
+    dataset_name = os.environ.get("BQ_DATASET")
+    project_id = os.environ.get("GCP_PROJECT_ID")
 
     if not dataset_name or not project_id:
-        raise SystemExit(f"Config missing values for BQ_DATASET or GCP_PROJECT_ID. Config = {config}")
+        raise SystemExit(f"Missing required environment variables BQ_DATASET or GCP_PROJECT_ID. BQ_DATASET={dataset_name}, GCP_PROJECT_ID={project_id}")
+
+    # Dry run mode - validate configuration and exit
+    if os.environ.get('CITIBIKE_DRY_RUN', '').lower() == 'true':
+        print("✅ DRY RUN: Configuration loaded successfully")
+        print(f"   Environment: {env_name}")
+        print(f"   GCP_PROJECT_ID: {project_id}")
+        print(f"   BQ_DATASET: {dataset_name}")
+        print(f"   GOOGLE_APPLICATION_CREDENTIALS: {os.environ.get('GOOGLE_APPLICATION_CREDENTIALS', 'NOT SET')}")
+        print(f"   Tables that would be created: {len(TABLE_NAMES) * len(TABLE_SUFFIXES)}")
+        print("⏹️  Stopping here - no actual BigQuery operations performed")
+        return
+
+    # Temporary shim for initialize_bigquery_client compatibility
+    config = {
+        'GOOGLE_APPLICATION_CREDENTIALS': os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'),
+        'GCP_PROJECT_ID': project_id
+    }
+    client = initialize_bigquery_client(config)
 
     # Prepare list of tables that will be created
     tables_to_create = [f"`{project_id}.{dataset_name}.{table_name}{suffix}`" for table_name in TABLE_NAMES for suffix in TABLE_SUFFIXES]

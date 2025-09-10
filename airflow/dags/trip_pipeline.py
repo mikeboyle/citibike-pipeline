@@ -1,7 +1,8 @@
 import sys
 import json
+import os
 
-from citibike.config import load_config
+from citibike.config import load_env_config
 from citibike.ingestion.trips import ingest_trip_data
 from citibike.ingestion.stations import ingest_station_data
 from citibike.dbt import run_dbt_command
@@ -27,8 +28,31 @@ def run():
     except ValueError:
         raise SystemExit(f"Usage: python trip_pipeline <year> <month>, got: {year_arg} for year and {month_arg} for month")
 
-    # run the pipeline
-    config = load_config("dev") # hard code this for now TODO: make env a argument
+    # Load environment configuration
+    env_name = os.environ.get('CITIBIKE_ENV', 'dev')
+    load_env_config(env_name)
+    
+    # Dry run mode - validate configuration and exit
+    if os.environ.get('CITIBIKE_DRY_RUN', '').lower() == 'true':
+        print("✅ DRY RUN: Configuration loaded successfully")
+        print(f"   Environment: {env_name}")
+        print(f"   Year/Month: {year}/{month} (month_key: {month_key})")
+        print(f"   GCP_PROJECT_ID: {os.environ.get('GCP_PROJECT_ID', 'NOT SET')}")
+        print(f"   BQ_DATASET: {os.environ.get('BQ_DATASET', 'NOT SET')}")
+        print(f"   GOOGLE_APPLICATION_CREDENTIALS: {os.environ.get('GOOGLE_APPLICATION_CREDENTIALS', 'NOT SET')}")
+        print(f"   GBFS_STATION_URL: {os.environ.get('GBFS_STATION_URL', 'NOT SET')}")
+        print(f"   TRIP_DATA_URL: {os.environ.get('TRIP_DATA_URL', 'NOT SET')}")
+        print("⏹️  Stopping here - no data ingestion or dbt operations performed")
+        return
+    
+    # Temporary shim for functions that still expect config dict
+    config = {
+        'GOOGLE_APPLICATION_CREDENTIALS': os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'),
+        'GCP_PROJECT_ID': os.environ.get('GCP_PROJECT_ID'),
+        'BQ_DATASET': os.environ.get('BQ_DATASET'),
+        'GBFS_STATION_URL': os.environ.get('GBFS_STATION_URL'),
+        'TRIP_DATA_URL': os.environ.get('TRIP_DATA_URL')
+    }
 
     print(f"Stage 1: Ingest station data from API")
     ingestion_date = now_nyc_datetime()
