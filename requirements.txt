@@ -6,7 +6,6 @@ babel==2.17.0
 cachetools==5.5.2
 certifi==2025.8.3
 charset-normalizer==3.4.3
--e git+ssh://git@github.com/mikeboyle/citibike-pipeline.git@2bb01bbeeab4dae5783b7398475d36cc059d86e8#egg=citibike
 click==8.2.1
 colorama==0.4.6
 daff==1.4.2
