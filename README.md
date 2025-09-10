@@ -77,8 +77,8 @@ This pipeline processes historical and real-time Citibike data to create:
    - Copy `config/dev.env.example` to `config/dev.env`
    - Copy `config/prod.env.example` to `config/prod.env`
    - Update `GCP_PROJECT_ID` in both files with your actual project ID
-   - Save the JSON key as `config/service-account.json`
-   - Update `GOOGLE_APPLICATION_CREDENTIALS` in `config/*.env` to the **absolute** path to your `service-account.json` credentials
+   - Save the JSON key to the path `config/service-account.json`
+   - The `GOOGLE_APPLICATION_CREDENTIALS` path is already set to `config/service-account.json` (relative path) in the config files; leave it as is.
 
 ### 3. Data Setup
 
@@ -116,6 +116,25 @@ This is a pipeline that does more advanced network flow analysis of the silver t
    - Ensure that you have previously processed trips and stations data (using the monthly trips pipeline) for the most recent 90 days of available data
    - `cd` to the `airflow/dags` directory
    - Run the pipeline: `python network_analysis_pipeline.py`.
+
+## Development and Testing
+
+### Dry Run Mode
+
+For testing configuration and validating connections without executing actual operations, set the `CITIBIKE_DRY_RUN` environment variable:
+
+```bash
+export CITIBIKE_DRY_RUN=true
+python create_tables.py dev          # Validates config, shows table count, no BigQuery operations
+python trip_pipeline.py 2024 6      # Validates config and connections, no data ingestion
+python network_analysis_pipeline.py # Validates config, no transformations
+```
+
+This mode is useful for:
+- Testing configuration changes
+- Validating credentials and BigQuery connections
+- CI/CD pipeline testing
+- Onboarding new developers
 
 ## Coming soon
 
