@@ -8,14 +8,6 @@ def run():
     env_name = os.environ.get('CITIBIKE_ENV', 'dev')
     load_env_config(env_name)
     
-    # Temporary shim for ingest_borough_boundaries that expects config dict
-    config = {
-        'GOOGLE_APPLICATION_CREDENTIALS': os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'),
-        'GCP_PROJECT_ID': os.environ.get('GCP_PROJECT_ID'),
-        'BQ_DATASET': os.environ.get('BQ_DATASET'),
-        'NYC_BOROUGH_BOUNDARY_URL': os.environ.get('NYC_BOROUGH_BOUNDARY_URL')
-    }
-
     # Dry run mode - validate configuration and exit
     if os.environ.get('CITIBIKE_DRY_RUN', '').lower() == 'true':
         print("✅ DRY RUN: Configuration loaded successfully")
@@ -23,13 +15,21 @@ def run():
         print(f"   GCP_PROJECT_ID: {os.environ.get('GCP_PROJECT_ID', 'NOT SET')}")
         print(f"   BQ_DATASET: {os.environ.get('BQ_DATASET', 'NOT SET')}")
         print(f"   GOOGLE_APPLICATION_CREDENTIALS: {os.environ.get('GOOGLE_APPLICATION_CREDENTIALS', 'NOT SET')}")
-        print(f"   GBFS_STATION_URL: {os.environ.get('GBFS_STATION_URL', 'NOT SET')}")
-        print(f"   TRIP_DATA_URL: {os.environ.get('TRIP_DATA_URL', 'NOT SET')}")
+        print(f"   NYC_BOROUGH_BOUNDARY_URL: {os.environ.get('NYC_BOROUGH_BOUNDARY_URL', 'NOT SET')}")
+        
+        # Test BigQuery connection
+        try:
+            from citibike.database.bigquery import initialize_bigquery_client
+            initialize_bigquery_client(validate_connection=True)
+        except Exception as e:
+            print(f"❌ BigQuery connection validation failed: {e}")
+            return
+        
         print("⏹️  Stopping here - no data ingestion or dbt operations performed")
         return
     
     print("Stage 1: Ingest official borough boundaries")
-    ingest_borough_boundaries(config)
+    ingest_borough_boundaries()
 
     print("Stage 2: Transform to silver layer")
     dbt_command = "dbt run --select +silver_nyc_borough_boundaries"

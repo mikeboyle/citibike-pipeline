@@ -1,5 +1,5 @@
 import os
-from dotenv import load_dotenv
+from citibike.config import load_env_config
 from citibike.database.bigquery import initialize_bigquery_client
 import sys
 from glob import glob
@@ -30,7 +30,7 @@ def run() -> None:
         env_name = sys.argv[1]
     
     # Load environment configuration
-    load_dotenv(f"config/{env_name}.env")
+    load_env_config(env_name)
     
     dataset_name = os.environ.get("BQ_DATASET")
     project_id = os.environ.get("GCP_PROJECT_ID")
@@ -49,12 +49,7 @@ def run() -> None:
         print("⏹️  Stopping here - no actual BigQuery operations performed")
         return
 
-    # Temporary shim for initialize_bigquery_client compatibility
-    config = {
-        'GOOGLE_APPLICATION_CREDENTIALS': os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'),
-        'GCP_PROJECT_ID': project_id
-    }
-    client = initialize_bigquery_client(config)
+    client = initialize_bigquery_client(validate_connection=True)
 
     # Prepare list of tables that will be created
     tables_to_create = [f"`{project_id}.{dataset_name}.{table_name}{suffix}`" for table_name in TABLE_NAMES for suffix in TABLE_SUFFIXES]

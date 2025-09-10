@@ -42,24 +42,24 @@ def run():
         print(f"   GOOGLE_APPLICATION_CREDENTIALS: {os.environ.get('GOOGLE_APPLICATION_CREDENTIALS', 'NOT SET')}")
         print(f"   GBFS_STATION_URL: {os.environ.get('GBFS_STATION_URL', 'NOT SET')}")
         print(f"   TRIP_DATA_URL: {os.environ.get('TRIP_DATA_URL', 'NOT SET')}")
+        
+        # Test BigQuery connection
+        try:
+            from citibike.database.bigquery import initialize_bigquery_client
+            initialize_bigquery_client(validate_connection=True)
+        except Exception as e:
+            print(f"❌ BigQuery connection validation failed: {e}")
+            return
+        
         print("⏹️  Stopping here - no data ingestion or dbt operations performed")
         return
     
-    # Temporary shim for functions that still expect config dict
-    config = {
-        'GOOGLE_APPLICATION_CREDENTIALS': os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'),
-        'GCP_PROJECT_ID': os.environ.get('GCP_PROJECT_ID'),
-        'BQ_DATASET': os.environ.get('BQ_DATASET'),
-        'GBFS_STATION_URL': os.environ.get('GBFS_STATION_URL'),
-        'TRIP_DATA_URL': os.environ.get('TRIP_DATA_URL')
-    }
-
     print(f"Stage 1: Ingest station data from API")
     ingestion_date = now_nyc_datetime()
-    ingest_station_data(config, ingestion_date)
+    ingest_station_data(ingestion_date)
 
     print(f"Stage 2: Ingest trip data for {month_key}")
-    ingest_trip_data(config, year, month)
+    ingest_trip_data(year, month)
 
     print(f"Stage 3: Transform data through gold dashboard models")
     dbt_vars = json.dumps({ "month_key": month_key })
