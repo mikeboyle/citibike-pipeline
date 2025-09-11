@@ -106,6 +106,7 @@ spec:
 8. **DAG Testing** - Verify boundaries_pipeline works end-to-end
 
 ### 📋 **Next Steps**
+0. **Update README.md** - New instructions to run local development through Airflow UI or CLI only
 1. **Complete DAG Conversion** - Convert remaining pipeline scripts
 2. **Test dry-run functionality with DAG parameters** (we never fully tested this)
 3. **Improve dbt logging in `run_dbt_command()` helper**
