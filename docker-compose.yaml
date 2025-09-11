@@ -75,13 +75,9 @@ x-airflow-common:
     
     # CitiBike environment variables
     CITIBIKE_ENV: ${CITIBIKE_ENV:-dev}
-    PYTHONPATH: /opt/airflow/citibike-pipeline
+    PYTHONPATH: /opt/airflow
   volumes:
-    - ${AIRFLOW_PROJ_DIR:-.}/airflow/dags:/opt/airflow/dags
-    - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
-    - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
-    - ${AIRFLOW_PROJ_DIR:-.}/airflow/plugins:/opt/airflow/plugins
-    - ${AIRFLOW_PROJ_DIR:-.}/dbt_transformations:/opt/airflow/dbt_transformations
+    - ${AIRFLOW_PROJ_DIR:-.}:/opt/airflow
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
