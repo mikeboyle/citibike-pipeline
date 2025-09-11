@@ -101,16 +101,18 @@ spec:
 3. **Runtime Package Installation** - Supports live editing
 4. **Init Script Strategy** - Clean separation of build vs runtime concerns
 5. **Environment Configuration** - Works with existing config system
-
-### 🚧 **In Progress**
-1. **DAG Testing** - Verify boundaries_pipeline works end-to-end
-2. **Profile Generation** - Confirm dbt paths resolve correctly
+6. **Profile Generation** - Confirm dbt paths resolve correctly
+7. **Automated initialization** - Runs just before the Airflow entrypoint script
+8. **DAG Testing** - Verify boundaries_pipeline works end-to-end
 
 ### 📋 **Next Steps**
 1. **Complete DAG Conversion** - Convert remaining pipeline scripts
-2. **Production Build Args** - Add ENV=prod support to Dockerfile  
-3. **Kubernetes Manifests** - Create production deployment configs
-4. **CI/CD Pipeline** - Automate build and deploy process
+2. **Test dry-run functionality with DAG parameters** (we never fully tested this)
+3. **Improve dbt logging in `run_dbt_command()` helper**
+  - Better integration with Airflow logs (we fixed basic capture but could be cleaner, right now it still logs to dbt_transformations/logs)
+4. **Production Build Args** - Add ENV=prod support to Dockerfile  
+5. **Kubernetes Manifests** - Create production deployment configs
+6. **CI/CD Pipeline** - Automate build and deploy process
 
 ## Architecture Benefits
 
