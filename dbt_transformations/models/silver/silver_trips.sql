@@ -10,14 +10,60 @@
 ) }}
 
 WITH unified_base AS (
-    SELECT * FROM {{ ref('stg_trips_legacy') }}
+    SELECT 
+        ride_id,
+        started_at,
+        ended_at,
+        trip_duration_seconds,
+        {{ normalize_station_id('start_station_id') }} as start_station_id,
+        start_station_name,
+        {{ normalize_station_id('end_station_id') }} as end_station_id,
+        end_station_name,
+        start_lat,
+        start_lng,
+        end_lat,
+        end_lng,
+        member_casual,
+        gender,
+        bike_id,
+        birth_year,
+        rideable_type,
+        legacy_start_station_id,
+        legacy_end_station_id,
+        data_source_schema,
+        _ingested_at,
+        _batch_key
+    FROM {{ ref('stg_trips_legacy') }}
     {% if is_incremental() %}
     WHERE _batch_key LIKE '{{ var("month_key") }}%'
     {% endif %}
 
     UNION ALL
 
-    SELECT * FROM {{ ref('stg_trips_current') }}
+    SELECT 
+        ride_id,
+        started_at,
+        ended_at,
+        trip_duration_seconds,
+        {{ normalize_station_id('start_station_id') }} as start_station_id,
+        start_station_name,
+        {{ normalize_station_id('end_station_id') }} as end_station_id,
+        end_station_name,
+        start_lat,
+        start_lng,
+        end_lat,
+        end_lng,
+        member_casual,
+        gender,
+        bike_id,
+        birth_year,
+        rideable_type,
+        legacy_start_station_id,
+        legacy_end_station_id,
+        data_source_schema,
+        _ingested_at,
+        _batch_key
+    FROM {{ ref('stg_trips_current') }}
     {% if is_incremental() %}
     WHERE _batch_key LIKE '{{ var("month_key") }}%'
     {% endif %}
