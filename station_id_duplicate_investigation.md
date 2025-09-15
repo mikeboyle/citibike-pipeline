@@ -130,7 +130,7 @@ cd dbt_transformations
 dbt run --select silver_trips silver_stations --full-refresh --target prod
 
 # Rebuild downstream gold models
-dbt run --select +gold_station_performance_dashboard --target prod
+dbt run --select gold_dim_stations gold_station_performance_dashboard --full-refresh --target prod
 ```
 
 **2. Verification queries:**
