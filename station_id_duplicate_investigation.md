@@ -99,9 +99,88 @@ Implement **station ID normalization** to handle the upstream data inconsistency
 - ✅ **Root cause identified**: CitiBike upstream data inconsistency over time
 - ✅ **Solution path clear**: Normalize station IDs to handle external inconsistency
 
+## Solution Implementation
+
+### Fix Applied
+Created a dbt macro to normalize station IDs consistently:
+
+**File: `macros/normalize_station_id.sql`**
+```sql
+{% macro normalize_station_id(station_id_field) %}
+  CASE 
+    WHEN REGEXP_CONTAINS({{ station_id_field }}, r'^\d+\.\d+$')
+    THEN FORMAT("%.2f", CAST({{ station_id_field }} AS FLOAT64))
+    ELSE {{ station_id_field }}
+  END
+{% endmacro %}
+```
+
+**Applied normalization to:**
+1. **`silver_trips.sql`**: Normalized `start_station_id` and `end_station_id` in the `unified_base` CTE
+2. **`silver_stations.sql`**: Added `normalized_stations` CTE to normalize `short_name` field
+
+### Production Deployment Commands
+
+**1. Deploy the fix:**
+```bash
+# Navigate to dbt directory
+cd dbt_transformations
+
+# Full refresh silver layer to apply normalization to all data
+dbt run --select silver_trips silver_stations --full-refresh --target prod
+
+# Rebuild downstream gold models
+dbt run --select +gold_station_performance_dashboard --target prod
+```
+
+**2. Verification queries:**
+
+**Check silver layer normalization worked:**
+```sql
+-- Verify no .1 format station IDs remain in silver_trips
+SELECT 
+  start_station_id,
+  COUNT(*) as count
+FROM `citibike-pipeline.citibike.silver_trips`
+WHERE start_station_id LIKE '%.1' AND start_station_id NOT LIKE '%.1[0-9]'
+GROUP BY start_station_id
+ORDER BY start_station_id
+-- Expected: No results (all .1 should be normalized to .10)
+
+-- Verify no .1 format station IDs remain in silver_stations  
+SELECT 
+  short_name,
+  COUNT(*) as count
+FROM `citibike-pipeline.citibike.silver_stations`
+WHERE short_name LIKE '%.1' AND short_name NOT LIKE '%.1[0-9]'
+GROUP BY short_name
+ORDER BY short_name
+-- Expected: No results (all .1 should be normalized to .10)
+```
+
+**Check dashboard duplicates eliminated:**
+```sql
+-- Verify dashboard duplicates are eliminated
+SELECT 
+  station_name, lat, lon,
+  COUNT(*) as duplicate_count
+FROM `citibike-pipeline.citibike.gold_station_performance_dashboard`
+GROUP BY station_name, lat, lon
+HAVING COUNT(*) > 1
+ORDER BY duplicate_count DESC
+-- Expected: No results (zero duplicates)
+```
+
+### Test Results
+- ✅ **Dev testing**: 4k rows processed, all station IDs normalized to `.10` format
+- ✅ **Downstream impact**: Dashboard duplicates reduced to zero
+- ✅ **Legacy stations**: Automatically filtered out by NULL short_name values
+- ✅ **No collisions**: Normalization safe (no existing conflicts)
+
 ## Files Affected
 
-- `models/gold/analytics/gold_station_performance_dashboard.sql` (symptom)
-- `models/gold/dimensions/gold_dim_stations.sql` (duplicates)
-- `models/silver/silver_trips.sql` (potential normalization point)
-- Raw trip data tables (source of issue)
+- `macros/normalize_station_id.sql` (new normalization macro)
+- `models/silver/silver_trips.sql` (applies normalization to trip station IDs)
+- `models/silver/silver_stations.sql` (applies normalization to station short_name)
+- `models/gold/analytics/gold_station_performance_dashboard.sql` (symptom resolved)
+- `models/gold/dimensions/gold_dim_stations.sql` (duplicates reduced)
