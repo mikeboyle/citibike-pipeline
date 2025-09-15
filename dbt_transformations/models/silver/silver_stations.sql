@@ -22,9 +22,30 @@ WITH parsed_stations AS (
 
 ),
 
+normalized_stations AS (
+    SELECT
+        station_id,
+        name,
+        {{ normalize_station_id('short_name') }} AS short_name,
+        region_id,
+        lat,
+        lon,
+        external_id,
+        has_kiosk,
+        eightd_has_key_dispenser,
+        electric_bike_surcharge_waiver,
+        capacity,
+        station_type,
+        station_data,
+        api_last_updated,
+        api_version,
+        _ingested_at
+    FROM parsed_stations
+),
+
 latest_stations AS (
     SELECT *
-    FROM parsed_stations
+    FROM normalized_stations
     QUALIFY 
         ROW_NUMBER() OVER (
             PARTITION BY station_id
