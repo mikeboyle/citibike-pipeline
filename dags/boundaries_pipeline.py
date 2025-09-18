@@ -20,8 +20,7 @@ default_args = {
     'start_date': datetime(2024, 1, 1),
     'email_on_failure': False,  # Set to True and add email for notifications
     'email_on_retry': False,
-    'retries': 2,  # Retry failed tasks 2 times
-    'retry_delay': timedelta(minutes=5),  # Wait 5 minutes between retries
+    'retries': 0,  # don't retry failed task
 }
 
 # Define the DAG
