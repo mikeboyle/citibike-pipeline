@@ -1,12 +1,5 @@
-"""
-DAG conversion:
-1. Set up the DAG structure
-2. Convert stages to Airflow tasks
-3. Handle environment setup
-4. Choose task operators
-"""
 import os
-from datetime import datetime, timedelta
+from datetime import datetime
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from citibike.config import load_env_config
@@ -36,20 +29,12 @@ dag = DAG(
 def ingest_boundaries_task():
     env_name = os.environ.get('CITIBIKE_ENV', 'dev')
     load_env_config(env_name)
-
-    if os.environ.get('CITIBIKE_DRY_RUN', '').lower() == 'true':
-        print("✅ DRY RUN: Skipping ingest_borough_boundaries")
-        return
     
     ingest_borough_boundaries()
 
 def transform_boundaries_task():
     env_name = os.environ.get('CITIBIKE_ENV', 'dev')
     load_env_config(env_name)
-
-    if os.environ.get('CITIBIKE_DRY_RUN', '').lower() == 'true':
-        print("✅ DRY RUN: Skipping dbt transformation")
-        return
     
     dbt_command = "dbt run --select +silver_nyc_borough_boundaries"
     run_dbt_command(dbt_command.split())
