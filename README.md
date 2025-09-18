@@ -136,6 +136,30 @@ This mode is useful for:
 - CI/CD pipeline testing
 - Onboarding new developers
 
+### Local Airflow Development
+
+For local development with Airflow, use Docker Compose to run a complete Airflow environment:
+
+```bash
+# Start Airflow services (webserver, scheduler, database)
+AIRFLOW_UID=$(id -u) docker compose up
+
+# Access Airflow UI
+open http://localhost:8080
+# Login: airflow / airflow
+```
+
+This provides:
+- Airflow webserver at localhost:8080
+- Your citibike package and DAGs available in Airflow
+- dbt profile automatically generated on container startup
+- Config files mounted from your local `config/` directory
+
+To stop the services:
+```bash
+docker-compose down
+```
+
 ## Coming soon
 
 - Dashboard reports and visualizations in Looker

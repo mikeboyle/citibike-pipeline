@@ -32,6 +32,13 @@ venv/
 *.json.gz
 *.parquet
 
+# Airflow
+logs/
+plugins/
+airflow-webserver.pid
+airflow.cfg
+webserver_config.py
+
 # dbt
 !dbt_transformations/seeds/*.csv
 dbt_transformations/target/

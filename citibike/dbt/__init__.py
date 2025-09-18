@@ -10,10 +10,16 @@ def run_dbt_command(command_args: List[LiteralString] | List[str]) -> None:
     result = subprocess.run(
         command_args,
         cwd=dbt_dir,
-        capture_output=False,
-        check=True,
+        capture_output=True,
+        check=False,
         text=True,
     )
 
+    # Print output to logs
+    if result.stdout:
+        print(result.stdout)
+    if result.stderr:
+        print(result.stderr)
+
     if result.returncode != 0:
-        raise Exception(result.stderr)
+        raise Exception(f"dbt command failed with exit code {result.returncode}. See output above for details.")
