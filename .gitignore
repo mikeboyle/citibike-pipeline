@@ -44,7 +44,6 @@ webserver_config.py
 dbt_transformations/target/
 dbt_transformations/dbt_packages/
 dbt_transformations/logs/
-dbt_transformations/profiles.yml
 dbt_transformations/.user.yml
 **/logs/dbt.log
 
