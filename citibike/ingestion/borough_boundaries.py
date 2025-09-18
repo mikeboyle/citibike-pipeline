@@ -1,28 +1,23 @@
 import os
-from typing import Any, Dict
-import requests
 import json
 from datetime import datetime, timezone
 
 from citibike.database.bigquery import initialize_bigquery_client
 
 def ingest_borough_boundaries():
-    """Fetch NYC borough boundaries and load to BigQuery raw table"""
-    
-    url = os.environ['NYC_BOROUGH_BOUNDARY_URL']
-    print(f"Fetching data from {url}...")
+    """Load NYC borough boundaries from local JSON file to BigQuery raw table"""
 
-    response = requests.get(url)
-    response.raise_for_status()
-    geojson_data = response.json()
+    json_file_path = os.path.join(os.path.dirname(__file__), "../data/nyc_borough_boundaries.json")
 
-    print(f"Data received from {url}...")
+    with open(json_file_path, "r") as f:
+        boundaries_data = json.load(f)
 
+    print(f"Loaded {len(boundaries_data['features'])} borough boundaries from local file")
 
     # Prepare rows for BigQuery (one row per borough)
     rows = []
     batch_key = datetime.now(timezone.utc).isoformat()
-    for feature in geojson_data["features"]:
+    for feature in boundaries_data["features"]:
         rows.append({
             "borough_code": int(feature["properties"]["BoroCode"]),
             "borough_name": feature["properties"]["BoroName"],
