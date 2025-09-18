@@ -15,7 +15,6 @@ def run():
         print(f"   GCP_PROJECT_ID: {os.environ.get('GCP_PROJECT_ID', 'NOT SET')}")
         print(f"   BQ_DATASET: {os.environ.get('BQ_DATASET', 'NOT SET')}")
         print(f"   GOOGLE_APPLICATION_CREDENTIALS: {os.environ.get('GOOGLE_APPLICATION_CREDENTIALS', 'NOT SET')}")
-        print(f"   NYC_BOROUGH_BOUNDARY_URL: {os.environ.get('NYC_BOROUGH_BOUNDARY_URL', 'NOT SET')}")
         
         # Test BigQuery connection
         try:
