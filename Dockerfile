@@ -19,14 +19,6 @@ cd /opt/airflow
 echo "🚀 Installing citibike package from volume mount..."
 pip install -e .
 
-echo "📝 Generating dbt profile if needed..."
-if [ ! -f dbt_transformations/profiles.yml ]; then
-    python generate_dbt_profile.py
-    echo "✅ dbt profile generated"
-else
-    echo "✅ dbt profile already exists"
-fi
-
 echo "✅ CitiBike initialization complete"
 
 # Call original Airflow entrypoint
