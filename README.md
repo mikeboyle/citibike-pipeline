@@ -142,7 +142,7 @@ For local development with Airflow, use Docker Compose to run a complete Airflow
 
 ```bash
 # Start Airflow services (webserver, scheduler, database)
-AIRFLOW_UID=$(id -u) docker compose up
+CITIBIKE_ENV=dev AIRFLOW_UID=$(id -u) docker compose up
 
 # Access Airflow UI
 open http://localhost:8080
