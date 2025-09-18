@@ -1,0 +1,8 @@
+.git/
+.venv/
+logs/
+*.egg-info/
+__pycache__/
+airflow.cfg
+webserver_config.py
+airflow-webserver.pid
