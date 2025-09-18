@@ -16,22 +16,18 @@ set -e
 # Change to the volume-mounted directory
 cd /opt/airflow
 
-# Only run initialization once per container
-if [ ! -f /tmp/.citibike-init-done ]; then
-    echo "🚀 Installing citibike package from volume mount..."
-    pip install -e .
-    
-    echo "📝 Generating dbt profile if needed..."
-    if [ ! -f dbt_transformations/profiles.yml ]; then
-        python generate_dbt_profile.py
-        echo "✅ dbt profile generated"
-    else
-        echo "✅ dbt profile already exists"
-    fi
-    
-    touch /tmp/.citibike-init-done
-    echo "✅ CitiBike initialization complete"
+echo "🚀 Installing citibike package from volume mount..."
+pip install -e .
+
+echo "📝 Generating dbt profile if needed..."
+if [ ! -f dbt_transformations/profiles.yml ]; then
+    python generate_dbt_profile.py
+    echo "✅ dbt profile generated"
+else
+    echo "✅ dbt profile already exists"
 fi
+
+echo "✅ CitiBike initialization complete"
 
 # Call original Airflow entrypoint
 exec /entrypoint "\$@"
