@@ -22,9 +22,9 @@ This pipeline processes historical and real-time Citibike data to create:
 
 - `citibike/` - Core Python package with ingestion, database, and utility modules
 - `dbt_transformations/` - dbt models organized in staging/silver/gold layers
-- `airflow/` - Orchestration scripts (coming soon: proper Airflow DAGs)
+- `dags/` - Airflow dags
 - `config/` - Environment configuration files
-- Root scripts - Setup utilities for tables, profiles, and holidays
+- Root scripts - Setup utilities for tables and seed data
 
 ## Setup
 
@@ -106,40 +106,6 @@ This pipeline processes historical and real-time Citibike data to create:
    - NYC holidays: `cd dbt_transformations && dbt seed`
    - Borough boundaries: `cd airflow/dags && python boundaries_pipeline.py`
 
-## Running the pipelines
-
-1. **Monthly trips pipeline**
-Citibike updates its trip data once per month. This pipeline extracts, ingests, and enriches the trips data all the from raw data, to silver tables usable for AI/ML operations, to the data warehouse dimension tables and custom dashboard reports. It also queries the Citibike GBFS API for the latest stations data as well.
-
-   - `cd` to the `airflow/dags` directory
-   - Run the pipeline with the year and month of data you want to process: `python trip_pipeline.py <YYYY> <M>`. For example, for June 2025, run `python trip_pipeline.py 2025 6`.
-
-2. **Network flow analysis pipeline**
-This is a pipeline that does more advanced network flow analysis of the silver trips data, resulting in gold layer tables suitable for dashboard visualizations. It produces tables showing the edges and nodes of the morning commuter network, based on trips activity from the last 90 days of data, as well as a table that lists critical and bottleneck stations in the commuter network, ranked by the station's PageRank score.
-
-   - Ensure that you have previously processed trips and stations data (using the monthly trips pipeline) for the most recent 90 days of available data
-   - `cd` to the `airflow/dags` directory
-   - Run the pipeline: `python network_analysis_pipeline.py`.
-
-## Development and Testing
-
-### Dry Run Mode
-
-For testing configuration and validating connections without executing actual operations, set the `CITIBIKE_DRY_RUN` environment variable:
-
-```bash
-export CITIBIKE_DRY_RUN=true
-python create_tables.py dev          # Validates config, shows table count, no BigQuery operations
-python trip_pipeline.py 2024 6      # Validates config and connections, no data ingestion
-python network_analysis_pipeline.py # Validates config, no transformations
-```
-
-This mode is useful for:
-- Testing configuration changes
-- Validating credentials and BigQuery connections
-- CI/CD pipeline testing
-- Onboarding new developers
-
 ### Local Airflow Development
 
 For local development with Airflow, use Docker Compose to run a complete Airflow environment:
@@ -164,9 +130,24 @@ To stop the services:
 docker-compose down
 ```
 
+### Running the pipelines
+Pipelines can be triggered and monitored in the Airflow UI. The available pipelines are (or will soon be):
+
+1. **`boundaries_pipeline` DAG (ready for use)**
+Adds seed data to the `raw_nyc_borough_boundaries` table and then transforms this to geo polygons in the `silver_nyc_borough_boundaries` table.
+
+2. **Monthly trips pipeline (in progress)**
+Citibike updates its trip data once per month. This pipeline extracts, ingests, and enriches the trips data all the from raw data, to silver tables usable for AI/ML operations, to the data warehouse dimension tables and custom dashboard reports. It also queries the Citibike GBFS API for the latest stations data as well.
+
+3. **Network flow analysis pipeline (in progress)**
+This is a pipeline that does more advanced network flow analysis of the silver trips data, resulting in gold layer tables suitable for dashboard visualizations. It produces tables showing the edges and nodes of the morning commuter network, based on trips activity from the last 90 days of data, as well as a table that lists critical and bottleneck stations in the commuter network, ranked by the station's PageRank score.
+
+Before running this pipeline, ensure that you have previously processed trips and stations data (using the monthly trips pipeline) for the most recent 90 days of available data.
+
 ## Coming soon
 
-- Dashboard reports and visualizations in Looker
+- Publicly available dashboard reports and visualizations in Looker
+- Production deployment and CI/CD with Kubernetes and GitHub Actions
 - Dockerized Airflow DAGs for orchestrating the pipeline
 - Data quality validation and testing stages at key points in the pipeline
 
