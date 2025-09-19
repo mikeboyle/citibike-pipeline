@@ -130,6 +130,19 @@ To stop the services:
 docker-compose down
 ```
 
+**Selective volume mapping**
+In local development, the Airflow container maps the host machine project repo as a volume. This enables live editing. It is important to know that we do not mount the entire project, but only the selected directories that are needed to run airflow dags. At this time, those directories or files are:
+
+- `citibike/` (project package with utility files)
+- `config/` (config files and credentials for local development)
+- `dags/` (Airflow dags)
+- `dbt_transformation/` (dbt models, seeds, config, etc.)
+- `logs/` (Airflow logs, including dbt logs)
+- `plugins/` (created by Airflow, but gitignored)
+- `./setup.py` (needed to install the project local package)
+
+If you create a new top level directory in development and you need that directory to be run by an Airflow container, update the `volumes` section of `docker-compose.yaml` to include that directory, as well as any future `COPY` commands in `Dockerfile`.
+
 ### Running the pipelines
 Pipelines can be triggered and monitored in the Airflow UI. The available pipelines are (or will soon be):
 
