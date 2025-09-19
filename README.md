@@ -62,9 +62,9 @@ This pipeline processes historical and real-time Citibike data to create:
 ### 2. Local Environment Setup
 
 1. **Create Virtual Environment**
-   1. Clone this repo
-   2. `cd` into the root directory `citibike-pipeline`
-   3. Create and activate a virtual environment
+   - Clone this repo
+   - `cd` into the root directory `citibike-pipeline`
+   - Create and activate a virtual environment
    ```bash
    python3 -m venv .venv
    source .venv/bin/activate
@@ -128,7 +128,8 @@ To stop the services:
 docker compose down
 ```
 
-**Selective volume mapping**
+#### Selective volume mapping
+
 In local development, the Airflow container maps the host machine project repo as a volume. This enables live editing. It is important to know that we do not mount the entire project, but only the selected directories that are needed to run airflow dags. At this time, those directories or files are:
 
 - `citibike/` (project package with utility files)
@@ -142,52 +143,51 @@ In local development, the Airflow container maps the host machine project repo a
 If you create a new top level directory in development and you need that directory to be run by an Airflow container, update the `volumes` section of `docker-compose.yaml` to include that directory, as well as any future `COPY` commands in `Dockerfile`.
 
 ### Running the pipelines
-Pipelines can be triggered and monitored in the Airflow UI. The available pipelines are (or will soon be):
+Pipelines can be triggered and monitored in the Airflow UI. Note that for all DAGS you may first need to turn on the Pause / Unpause toggle to the left of the DAG name in the Airflow DAGs UI.
 
-Note that for all DAGS you may first need to turn on the Pause / Unpause toggle to the left of the DAG name in the Airflow DAGs UI.
+The available pipelines are:
 
 1. **`boundaries_pipeline` DAG (ready for use)**
-**What it does**: Adds seed data to the `raw_nyc_borough_boundaries` table and then transforms this to geo polygons in the `silver_nyc_borough_boundaries` table.
 
-**How to run it**:
-   1. Find the DAG in the Airflow UI `DAGs` page.
-   2. Press the "play" button (▶️) to the right to manually trigger it.
+   **What it does**: Adds seed data to the `raw_nyc_borough_boundaries` table and then transforms this to geo polygons in the `silver_nyc_borough_boundaries` table.
 
-**How to monitor the run**:
-   1. The datetime of the run will appear in the `DAGs` page under `Latest run`.
-   2. Click on this to see a page that monitors the status of each task in the DAG.
+   **How to run it**:
+      - Find the DAG in the Airflow UI `DAGs` page.
+      - Press the "play" button (▶️) to the right to manually trigger it.
 
 
 2. **`trips_pipeline` DAG (ready for use)**
-**What it does**: Citibike updates its trip data once per month. This pipeline extracts, ingests, and enriches the trips data all the from raw data, to silver tables usable for AI/ML operations, to the data warehouse dimension tables and custom dashboard reports. It also queries the Citibike GBFS API for the latest stations data as well.
 
-**How to run it**:
-   1. Find the DAG in the Airflow UI `DAGs` page.
-   2. Press the "play" button (▶️) to the right.
-   3. This will take you to a Params form. Enter your year (`2019`, `2025`, etc.) and month (`1`, `5`, `11`, etc.)
-   4. Click `Trigger`
-   5. You will be taken back to the `DAGs` page.
+   **What it does**:
+   Citibike updates its trip data once per month. This pipeline extracts, ingests, and enriches the trips data all the from raw data, to silver tables usable for AI/ML operations, to the data warehouse dimension tables and custom dashboard reports. It also queries the Citibike GBFS API for the latest stations data as well.
 
-**How to monitor the run**:
-   1. The datetime of the run will appear in the `DAGs` page under `Latest run`.
-   2. Click on this to see a page that monitors the status of each task in the DAG.
+   **How to run it**:
+      - Find the DAG in the Airflow UI `DAGs` page.
+      - Press the "play" button (▶️) to the right.
+      - This will take you to a Params form. Enter your year (`2019`, `2025`, etc.) and month (`1`, `5`, `11`, etc.)
+      - Click `Trigger`
+      - You will be taken back to the `DAGs` page.
 
 3. **Network flow analysis pipeline (in progress)**
-**What it does**: This is a pipeline that does more advanced network flow analysis of the silver trips data, resulting in gold layer tables suitable for dashboard visualizations. It produces tables showing the edges and nodes of the morning commuter network, based on trips activity from the last 90 days of data, as well as a table that lists critical and bottleneck stations in the commuter network, ranked by the station's PageRank score.
 
-Before running this pipeline, ensure that you have previously processed trips and stations data (using the monthly trips pipeline) for the most recent 90 days of available data.
+   **What it does**:
+   This is a pipeline that does more advanced network flow analysis of the silver trips data, resulting in gold layer tables suitable for dashboard visualizations. It produces tables showing the edges and nodes of the morning commuter network, based on trips activity from the last 90 days of data, as well as a table that lists critical and bottleneck stations in the commuter network, ranked by the station's PageRank score.
 
-**How to run it**:
-   1. Find the DAG in the Airflow UI `DAGs` page.
-   2. Press the "play" button (▶️) to the right to manually trigger it.
+   Before running this pipeline, ensure that you have previously processed trips and stations data (using the monthly trips pipeline) for the most recent 90 days of available data.
 
-**How to monitor the run**:
-   1. The datetime of the run will appear in the `DAGs` page under `Latest run`.
-   2. Click on this to see a page that monitors the status of each task in the DAG.
+   **How to run it**:
+      - Find the DAG in the Airflow UI `DAGs` page.
+      - Press the "play" button (▶️) to the right to manually trigger it.
+
+#### Monitoring pipeline runs
+
+After you trigger a pipeilne run:
+
+- The datetime of the run will appear in the `DAGs` page under `Latest run`.
+- Click on this to see a page that monitors the status of each task in the DAG.
 
 ## Coming soon
 
-- Publicly available dashboard reports and visualizations in Looker
 - Production deployment and CI/CD with Kubernetes and GitHub Actions
 - Data quality validation and testing stages at key points in the pipeline
 
