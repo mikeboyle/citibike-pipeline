@@ -90,7 +90,11 @@ This pipeline processes historical and real-time Citibike data to create:
    - Go to the BigQuery console and confirm that the expected tables were created
 
 2. **Configure DBT**
-   - Run `python generate_dbt_profile.py` to create `dbt_transformations/profiles.yml`
+   - Set local envvars:
+      ```bash
+      export CITIBIKE_ENV=dev
+      export GCP_PROJECT_ID=<your project id>
+      ```
    - Test connections:
      ```bash
      cd dbt_transformations
