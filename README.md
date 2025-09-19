@@ -16,6 +16,7 @@ This pipeline processes historical and real-time Citibike data to create:
 - **Transformations**: dbt (staging → silver → gold layers)
 - **Orchestration**: Apache Airflow DAGs
 - **Ingestion**: Custom Python modules for trips, stations, and boundary data
+- **Analysis**: Custom Python modules for graph analysis of the network
 - **Package Structure**: Modular Python package with separate modules for ingestion, database operations, and utilities
 
 ## Project Structure
@@ -24,6 +25,9 @@ This pipeline processes historical and real-time Citibike data to create:
 - `dbt_transformations/` - dbt models organized in staging/silver/gold layers
 - `dags/` - Airflow dags
 - `config/` - Environment configuration files
+- `plugins/` - Airflow plugins
+- `logs/` - Airflow logs (includes logging from dbt tasks run via Airflow)
+- `sql/` - Schema for initial tables not managed by dbt
 - Root scripts - Setup utilities for tables and seed data
 
 ## Setup
@@ -119,15 +123,9 @@ open http://localhost:8080
 # Login: airflow / airflow
 ```
 
-This provides:
-- Airflow webserver at localhost:8080
-- Your citibike package and DAGs available in Airflow
-- dbt profile automatically generated on container startup
-- Config files mounted from your local `config/` directory
-
 To stop the services:
 ```bash
-docker-compose down
+docker compose down
 ```
 
 **Selective volume mapping**
@@ -175,15 +173,22 @@ Note that for all DAGS you may first need to turn on the Pause / Unpause toggle 
    2. Click on this to see a page that monitors the status of each task in the DAG.
 
 3. **Network flow analysis pipeline (in progress)**
-This is a pipeline that does more advanced network flow analysis of the silver trips data, resulting in gold layer tables suitable for dashboard visualizations. It produces tables showing the edges and nodes of the morning commuter network, based on trips activity from the last 90 days of data, as well as a table that lists critical and bottleneck stations in the commuter network, ranked by the station's PageRank score.
+**What it does**: This is a pipeline that does more advanced network flow analysis of the silver trips data, resulting in gold layer tables suitable for dashboard visualizations. It produces tables showing the edges and nodes of the morning commuter network, based on trips activity from the last 90 days of data, as well as a table that lists critical and bottleneck stations in the commuter network, ranked by the station's PageRank score.
 
 Before running this pipeline, ensure that you have previously processed trips and stations data (using the monthly trips pipeline) for the most recent 90 days of available data.
+
+**How to run it**:
+   1. Find the DAG in the Airflow UI `DAGs` page.
+   2. Press the "play" button (▶️) to the right to manually trigger it.
+
+**How to monitor the run**:
+   1. The datetime of the run will appear in the `DAGs` page under `Latest run`.
+   2. Click on this to see a page that monitors the status of each task in the DAG.
 
 ## Coming soon
 
 - Publicly available dashboard reports and visualizations in Looker
 - Production deployment and CI/CD with Kubernetes and GitHub Actions
-- Dockerized Airflow DAGs for orchestrating the pipeline
 - Data quality validation and testing stages at key points in the pipeline
 
 
