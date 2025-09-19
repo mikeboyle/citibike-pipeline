@@ -176,8 +176,8 @@ The available pipelines are:
    Before running this pipeline, ensure that you have previously processed trips and stations data (using the monthly trips pipeline) for the most recent 90 days of available data.
 
    **How to run it**:
-      1. Find the DAG in the Airflow UI `DAGs` page.
-      2. Press the "play" button (▶️) to the right to manually trigger it.
+      - Find the DAG in the Airflow UI `DAGs` page.
+      - Press the "play" button (▶️) to the right to manually trigger it.
 
 #### Monitoring pipeline runs
 
