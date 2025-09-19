@@ -28,7 +28,7 @@ def ingest_borough_boundaries():
     print(f"Prepared {len(rows)} borough boundaries for ingestion")
 
     # Insert to BigQuery
-    client = initialize_bigquery_client(validate_connection=True)
+    client = initialize_bigquery_client()
     table_id = f"{os.environ['GCP_PROJECT_ID']}.{os.environ['BQ_DATASET']}.raw_nyc_borough_boundaries"
 
     errors = client.insert_rows_json(table_id, rows)

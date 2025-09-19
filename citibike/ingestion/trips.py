@@ -22,7 +22,7 @@ def _ingest_trip_data(year: int, month: int, table_name: str, schema: Dict[str, 
     """Download and ingest trip data for the given month, table, and schema."""
     # Initialize components
     storage = LocalStorage()
-    client = initialize_bigquery_client(validate_connection=True)
+    client = initialize_bigquery_client()
     table_id = f"{os.environ['GCP_PROJECT_ID']}.{os.environ['BQ_DATASET']}.{table_name}"
     loader = StagingTableLoader(client, table_id, "_batch_key")
 

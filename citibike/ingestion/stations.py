@@ -52,7 +52,7 @@ def ingest_station_data(batch_date: datetime) -> None:
     df['api_version'] = df['api_version'].astype(str)
 
     # Initialize BigQuery client 
-    client = initialize_bigquery_client(validate_connection=True)
+    client = initialize_bigquery_client()
 
     # Build table reference
     table_id = f"{os.environ['GCP_PROJECT_ID']}.{os.environ['BQ_DATASET']}.raw_stations"
