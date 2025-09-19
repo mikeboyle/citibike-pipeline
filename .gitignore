@@ -68,3 +68,7 @@ Thumbs.db
 .pytest_cache/
 .coverage
 htmlcov/
+
+
+# Development artifacts
+notes/
