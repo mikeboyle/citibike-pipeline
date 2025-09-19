@@ -38,17 +38,6 @@ def run() -> None:
     if not dataset_name or not project_id:
         raise SystemExit(f"Missing required environment variables BQ_DATASET or GCP_PROJECT_ID. BQ_DATASET={dataset_name}, GCP_PROJECT_ID={project_id}")
 
-    # Dry run mode - validate configuration and exit
-    if os.environ.get('CITIBIKE_DRY_RUN', '').lower() == 'true':
-        print("✅ DRY RUN: Configuration loaded successfully")
-        print(f"   Environment: {env_name}")
-        print(f"   GCP_PROJECT_ID: {project_id}")
-        print(f"   BQ_DATASET: {dataset_name}")
-        print(f"   GOOGLE_APPLICATION_CREDENTIALS: {os.environ.get('GOOGLE_APPLICATION_CREDENTIALS', 'NOT SET')}")
-        print(f"   Tables that would be created: {len(TABLE_NAMES) * len(TABLE_SUFFIXES)}")
-        print("⏹️  Stopping here - no actual BigQuery operations performed")
-        return
-
     client = initialize_bigquery_client(validate_connection=True)
 
     # Prepare list of tables that will be created
