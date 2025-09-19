@@ -38,7 +38,7 @@ def run() -> None:
     if not dataset_name or not project_id:
         raise SystemExit(f"Missing required environment variables BQ_DATASET or GCP_PROJECT_ID. BQ_DATASET={dataset_name}, GCP_PROJECT_ID={project_id}")
 
-    client = initialize_bigquery_client(validate_connection=True)
+    client = initialize_bigquery_client()
 
     # Prepare list of tables that will be created
     tables_to_create = [f"`{project_id}.{dataset_name}.{table_name}{suffix}`" for table_name in TABLE_NAMES for suffix in TABLE_SUFFIXES]

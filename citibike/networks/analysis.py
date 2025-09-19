@@ -7,7 +7,7 @@ import networkx as nx
 
 class CommuterNetworkAnalyzer:
     def __init__(self):
-        self.client: bigquery.Client  = initialize_bigquery_client(validate_connection=True)
+        self.client: bigquery.Client  = initialize_bigquery_client()
         self.project_id = os.environ['GCP_PROJECT_ID']
         self.dataset = os.environ['BQ_DATASET']
         self.SUPER_SOURCE = "super_source"
