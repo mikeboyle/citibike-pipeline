@@ -20,7 +20,7 @@ default_args = {
 dag = DAG(
     'boundaries_pipeline',
     default_args=default_args,
-    description='Get NYC borough boundaries geojson from API and persist to BigQuery',
+    description='Get NYC borough boundaries geojson from JSON datafile and persist to BigQuery',
     schedule_interval=None,  # Manual trigger only (no automatic scheduling)
     catchup=False,  # Don't run for past dates
     tags=['citibike'],
