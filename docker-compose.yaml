@@ -77,7 +77,15 @@ x-airflow-common:
     CITIBIKE_ENV: ${CITIBIKE_ENV:-dev}
     PYTHONPATH: /opt/airflow
   volumes:
-    - ${AIRFLOW_PROJ_DIR:-.}:/opt/airflow
+    # Core project directories
+    - ./citibike:/opt/airflow/citibike
+    - ./config:/opt/airflow/config
+    - ./dags:/opt/airflow/dags
+    - ./dbt_transformations:/opt/airflow/dbt_transformations
+    - ./plugins:/opt/airflow/plugins
+    - ./logs:/opt/airflow/logs
+    # Required files for package installation
+    - ./setup.py:/opt/airflow/setup.py
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
