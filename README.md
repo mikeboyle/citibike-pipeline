@@ -7,7 +7,7 @@ A comprehensive data pipeline that ingests, transforms, and analyzes NYC Citibik
 This pipeline processes historical and real-time Citibike data to create:
 - **Trip Analytics**: Detailed trip patterns, duration analysis, and usage trends
 - **Station Performance**: Station popularity, capacity utilization, and geographic insights
-- **Network Analysis**: Commuter flow patterns and critical / bottleneck hub identification. [Read more about this analysis here.](./network_analysis.md)
+- **Network Analysis**: Commuter flow patterns and critical / bottleneck hub identification. [Read more about this analysis here.](https://mikesboyle.medium.com/predicting-citibike-bottlenecks-with-max-flow-network-analysis-d52aa1b68013)
 - **Dimensional Models**: Time-based and station-based dimensions for analysis
 
 ## Architecture
